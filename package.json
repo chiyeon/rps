@@ -4,7 +4,7 @@
   "description": "a lil chat app",
   "main": "index.js",
   "scripts": {
-    "test": "node index.js"
+    "start": "node index.js"
   },
   "author": "chiyeon",
   "license": "ISC",
