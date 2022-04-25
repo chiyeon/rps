@@ -1,11 +1,14 @@
 var express = require("express");
-var app = express();
-var http = require('http').createServer(app);
-const PORT = process.env.PORT || 3000;
-var io = require('socket.io')(http);
+var http = require('http');
 
-const path = require("path");
 const cors = require("cors");
+const path = require("path");
+
+const PORT = process.env.PORT || 3000;
+
+var app = express();
+const server = http.createServer(app);
+var io = require('socket.io')(server);
 
 app.use(cors());
 
@@ -14,7 +17,7 @@ app.get("*", (req, res) => {
    res.sendFile(path.resolve(__dirname, "./dist", "index.html"));
 })
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
    console.log(`Started Server on *:${PORT}`);
 });
 
@@ -22,7 +25,7 @@ var lobbies = {}     // list of lobbies (key = name of lobby) (value = lobby obj
 var players = {}     // list of lobbies (key = socket id) (value = name of lobby)
 
 io.on('connection', (socket) => {
-console.log(`${socket.id} connected!`);
+   console.log(`${socket.id} connected!`);
 
    socket.on("disconnect", () => {
       console.log(`${socket.id} disconnected!`);
