@@ -1,10 +1,21 @@
-var app = require('express')();
+var express = require("express");
+var app = express();
 var http = require('http').createServer(app);
 const PORT = process.env.PORT || 3000;
 var io = require('socket.io')(http);
 
-http.listen(PORT, () => {
-    console.log(`listening on *:${PORT}`);
+const path = require("path");
+const cors = require("cors");
+
+app.use(cors());
+
+app.use(express.static(path.resolve(__dirname, "./dist/")))
+app.get("*", (req, res) => {
+   res.sendFile(path.resolve(__dirname, "./dist", "index.html"));
+})
+
+app.listen(PORT, () => {
+   console.log(`Started Server on *:${PORT}`);
 });
 
 var lobbies = {}     // list of lobbies (key = name of lobby) (value = lobby object)
