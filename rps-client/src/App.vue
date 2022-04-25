@@ -25,7 +25,7 @@ export default {
       Login
    },
    setup() {
-      const ENDPOINT = "http://127.0.0.1:3000"
+      const ENDPOINT = "https://tteok-rps.herokuapp.com/"
 
       var errorMessage = ref("");      // text error message, displays when not blank
 
