@@ -1,5 +1,5 @@
 # rps tournament
-**rps tournament** is a full stack Rock Paper Scissors tournament application.
+[**rps tournament**](https://tteok-rps.herokuapp.com/) is a full stack Rock Paper Scissors tournament application.
 
 With a backend powered by express & socket.io, players can interact with the Vue3 powered frontend to create, join, and leave lobbies with as many players as they need, choosing custom names & entering any lobbies they wish. 
 
