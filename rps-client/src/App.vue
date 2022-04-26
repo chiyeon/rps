@@ -37,7 +37,7 @@ export default {
       Game
    },
    setup() {
-      const DEBUG = true;
+      const DEBUG = false;
       const ENDPOINT = DEBUG ? "http://localhost:3000" : "https://tteok-rps.herokuapp.com/"
 
       var errorMessage = ref("");      // text error message, displays when not blank
