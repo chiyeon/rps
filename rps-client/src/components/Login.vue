@@ -46,12 +46,18 @@ export default {
    padding: 3px 10px 3px 10px;
    height: 30px;
 
+   background-color: var(--background-2);
+   color: var(--foreground-1);
+
    border: none;
 }
 
 .login input:last-child {
    border-radius: 0px 0px 10px 10px;
    cursor: pointer;
+
+   background-color: var(--background-3);
+   color: var(--foreground-1);
 }
 
 .login input:first-child {

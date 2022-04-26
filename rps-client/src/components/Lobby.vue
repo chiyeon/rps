@@ -37,12 +37,12 @@ export default {
 
 <style scoped>
 .lobby {
-   width: 200px;
+   width: 225px;
    height: 250px;
    border-radius: 10px;
 
-   color: white;
-   background-color: rgb(67, 67, 67);
+   color: var(--foreground-1);
+   background-color: var(--background-2);
 
    display: flex;
    flex-direction: column;
@@ -64,6 +64,15 @@ export default {
    border-radius: 0 0 10px 10px;
    cursor: pointer;
    border: none;
+
+   border: none;
+   background-color: var(--background-3);
+   color: var(--foreground-1);
+}
+
+button:disabled {
+   opacity: 0.5;
+   cursor: not-allowed;
 }
 </style>
 

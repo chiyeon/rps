@@ -6,17 +6,31 @@
       </div>
       <div v-if="lobbyStarted">
          <div v-if="!gameOver" class="game">
-            <div v-for="i in lobby.matches" :key="i.players[0].id">
-               {{i.players[0].name + (i.players[0].id == userSocket.id ? " (you)" : "")}} vs {{i.players[1].name + (i.players[1].id == userSocket.id ? " (you)" : "")}}
-               {{(i == lobby.matches[lobby.currentMatch]) ? "(current)" : ""}}
-            </div>
-            <div v-if="userSocket.id == lobby.matches[lobby.currentMatch].players[0].id || userSocket.id == lobby.matches[lobby.currentMatch].players[1].id">
-               <div class="options-box">
-                  <button class="option" @click="Select('rock')">🪨</button>
-                  <button class="option" @click="Select('paper')">📜</button>
-                  <button class="option" @click="Select('scissor')">✂️</button>
+            <div class="game-info">
+               <div class="game-info-matches">
+                  <div>Matches this Seed:</div>
+                  <div v-for="i in lobby.matches" :key="i.players[0].id">
+                     {{i.players[0].name + (i.players[0].id == userSocket.id ? " (you)" : "")}} vs {{i.players[1].name + (i.players[1].id == userSocket.id ? " (you)" : "")}}
+                     {{(i == lobby.matches[lobby.currentMatch]) ? "(current)" : ""}}
+                  </div>
+               </div>
+               <div class="game-info-log">
+                  <div>Game Transcript:</div>
+                  <div class="game-info-log-scroll">
+                     <div v-for="message in [...lobby.messages].reverse()" :key="message.id">
+                        {{message.content}}
+                     </div>
+                  </div>
                </div>
             </div>
+            
+            <div class="game-options" v-if="userSocket.id == lobby.matches[lobby.currentMatch].players[0].id || userSocket.id == lobby.matches[lobby.currentMatch].players[1].id">
+               <button :class="userChoice == 'rock' ? 'game-option selected' : 'game-option'" @click="Select('rock')">🪨</button>
+               <button :class="userChoice == 'paper' ? 'game-option selected' : 'game-option'" @click="Select('paper')">📜</button>
+               <button :class="userChoice == 'scissor' ? 'game-option selected' : 'game-option'" @click="Select('scissor')">✂️</button>
+            </div>
+
+           
          </div>
          <div v-if="gameOver" class="results">
             <div>Game is Over!</div>
@@ -44,7 +58,7 @@ export default {
       Login
    },
    setup() {
-      const DEBUG = false;
+      const DEBUG = true;
       const ENDPOINT = DEBUG ? "http://localhost:3000" : "https://tteok-rps.herokuapp.com/"
 
       var errorMessage = ref("");      // text error message, displays when not blank
@@ -55,6 +69,9 @@ export default {
 
       var userSocket = ref(null);      // ref to user socket client object
       var lobby = ref(null);           // ref to lobby object
+
+      // game
+      var userChoice = ref("");
 
 
       function Connect(_name, _lobby) {
@@ -68,9 +85,7 @@ export default {
          userSocket.value.on("lobby-update", _lobby => {
             inLobby.value = true;
             lobby.value = _lobby;
-
-            console.log("lobby update: ")
-            console.log(_lobby);
+            userChoice.value = "";
          })
 
          userSocket.value.on("connect", () => {
@@ -95,6 +110,10 @@ export default {
          userSocket.value.on("end-game", () => {
             gameOver.value = true;
          })
+
+         userSocket.value.on("new-message", messages => {
+            lobby.value.messages = messages;
+         });
       }
 
       function Begin() {
@@ -107,6 +126,7 @@ export default {
 
       function Select(_choice) {
          console.log("attempting to choose...");
+         userChoice.value = _choice;
          userSocket.value.emit("choose", {lobbyName: lobby.value.name, choice: _choice});
       }
 
@@ -125,6 +145,8 @@ export default {
          ResetError,
 
          Select,
+
+         userChoice
       }
    }
 }
@@ -137,6 +159,13 @@ export default {
    font-family: monospace;
 }
 
+:root {
+   --background-1: #272727;
+   --background-2: #3f3f3f;
+   --background-3: #5b5b5b;
+   --foreground-1: #ececec;
+}
+
 .app {
    width: 100vw;
    max-width: 100%;
@@ -147,19 +176,83 @@ export default {
    justify-content: center;
    align-items: center;
 
-   background-color: rgb(42, 42, 42);
+   background-color: var(--background-1);
 }
 
 .game {
-   color: white;
+   display: flex;
+   flex-direction: column;
+   gap: 10px;
+   
+   width: 500px;
+   height: 400px;
+
+   color: var(--foreground-1);
+}
+
+.game-info {
+   display: grid;
+   grid-template-columns: 1fr 1fr;
+   min-height: 0;
+
+   flex: 2;
+
+   border-radius: 10px;
+   padding: 10px;
+
+   background-color: var(--background-2);
+
+}
+
+.game-info-matches {
+   flex: 1;
+   overflow-y: auto;
+}
+
+.game-info-log {
+   flex: 1;
+   overflow-y: auto;
+}
+
+.game-options {
+   flex: 1;
+   display: flex;
+   flex-direction: row;
+
+   border-radius: 10px;
+   padding: 10px;
+
+   background-color: var(--background-2);
+}
+
+.game-option {
+   flex-grow: 1;
+   font-size: 60px;
+   
+   background: none;
+   border: none;
+
+   cursor: pointer;
+
+   opacity: 0.3;
+
+   transition: opacity 100ms;
+}
+
+.game-option:hover {
+   opacity: 0.7;
+}
+
+.game-option.selected {
+   opacity: 1;
 }
 
 .results {
    padding: 10px;
    border-radius: 10px;
 
-   background-color: rgb(66, 66, 66);
-   color: white;
+   background-color: var(--background-2);
+   color: var(--foreground-1);
 }
 
 </style>
