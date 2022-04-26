@@ -5,7 +5,7 @@
          <Lobby v-if="inLobby" @begin="Begin" :lobby="lobby" :selfID="userSocket.id"/>
       </div>
       <div v-if="lobbyStarted">
-         <div class="game">
+         <div v-if="!gameOver" class="game">
             <div v-for="i in lobby.matches" :key="i.players[0].id">
                {{i.players[0].name + (i.players[0].id == userSocket.id ? " (you)" : "")}} vs {{i.players[1].name + (i.players[1].id == userSocket.id ? " (you)" : "")}}
                {{(i == lobby.matches[lobby.currentMatch]) ? "(current)" : ""}}
@@ -17,6 +17,12 @@
                   <button class="option" @click="Select('scissor')">✂️</button>
                </div>
             </div>
+         </div>
+         <div v-if="gameOver" class="results">
+            <div>Game is Over!</div>
+            <div>Total Players: {{lobby.players.length}}</div>
+            <div>Winner: {{lobby.winners.first.name}}</div>
+            <div>Honored: {{lobby.winners.second.name}}</div>
          </div>
       </div>
       <ErrorMessage v-if="errorMessage != ''" @resetError="ResetError" :errorMessage="errorMessage" />
@@ -38,16 +44,18 @@ export default {
       Login
    },
    setup() {
-      const DEBUG = false;
+      const DEBUG = true;
       const ENDPOINT = DEBUG ? "http://localhost:3000" : "https://tteok-rps.herokuapp.com/"
 
       var errorMessage = ref("");      // text error message, displays when not blank
 
       var inLobby = ref(false);        // are we in lobby or not
       var lobbyStarted = ref(false);   // has lobby started the game yet
+      var gameOver = ref(false);       // show end screen or not
 
       var userSocket = ref(null);      // ref to user socket client object
       var lobby = ref(null);           // ref to lobby object
+
 
       function Connect(_name, _lobby) {
          if (_name == "" || _lobby == "") {
@@ -60,6 +68,9 @@ export default {
          userSocket.value.on("lobby-update", _lobby => {
             inLobby.value = true;
             lobby.value = _lobby;
+
+            console.log("lobby update: ")
+            console.log(_lobby);
          })
 
          userSocket.value.on("connect", () => {
@@ -79,6 +90,10 @@ export default {
          userSocket.value.on("start-game", () => {
             lobbyStarted.value = true;
             console.log(lobby.value);
+         })
+
+         userSocket.value.on("end-game", () => {
+            gameOver.value = true;
          })
       }
 
@@ -100,6 +115,7 @@ export default {
 
          inLobby,
          lobbyStarted,
+         gameOver,
 
          userSocket,
          lobby,
@@ -135,6 +151,14 @@ export default {
 }
 
 .game {
+   color: white;
+}
+
+.results {
+   padding: 10px;
+   border-radius: 10px;
+
+   background-color: rgb(66, 66, 66);
    color: white;
 }
 
