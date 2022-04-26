@@ -32,25 +32,28 @@ io.on('connection', (socket) => {
       if(!lobbies[players[socket.id]])
          return;
       
+      // if last player leaves lobby, just close it
       if(lobbies[players[socket.id]].players.length == 1) {
-         // last player to leave, just close lobby
          console.log(`Closing lobby '${lobbies[players[socket.id]].name}'`);
          delete lobbies[players[socket.id]];
          return;
       }
       
-      var shouldMigrateHost = false;
+      var shouldMigrateHost = false;      // consider whether or not migrate
 
+      // must do a host migration -> host is leaving
       if(lobbies[players[socket.id]].host.id == socket.id) {
-         // must do a host migration -> host is leaving
          shouldMigrateHost = true;
          console.log(`Host left lobby '${lobbies[players[socket.id]].name}'! Migrating...`);
       }
 
+      // remove player who is leaving from database
       lobbies[players[socket.id]].players = lobbies[players[socket.id]].players.filter(p => p.id != socket.id);
       if(shouldMigrateHost) {
          lobbies[players[socket.id]].host = lobbies[players[socket.id]].players[0];
       }
+
+      // update players
       lobbies[players[socket.id]].players.forEach(p => {
          io.to(p.id).emit("lobby-update", lobbies[players[socket.id]])
       })
@@ -59,18 +62,22 @@ io.on('connection', (socket) => {
    socket.on("login", (data) => {
       console.log(`connection from ${data.name}`)
 
+      // check if name is valid
       if(data.name.length > 10) {
          return io.to(data.id).emit("error", "Name is too long (>10 characters)");
       }
 
+      // TODO check profanity?
+
+      // put into players database
       players[data.id] = data.lobby;
 
+      // join existing lobby
       if(data.lobby in lobbies) {
-         // join existing lobby
 
          var canJoin = true;
 
-         // check if name exists
+         // check if name is already taken
          lobbies[data.lobby].players.forEach(p => {
             if(p.name == data.name) {
                console.log("duplicate name!");
@@ -89,6 +96,7 @@ io.on('connection', (socket) => {
             return;
          }
 
+         // add to database & update other players
          lobbies[data.lobby].players.push(data);
 
          lobbies[data.lobby].players.forEach(p => {
@@ -98,6 +106,7 @@ io.on('connection', (socket) => {
          // create new lobby
          console.log(`Creating lobby '${data.lobby}'...`)
 
+         // barebones lobby, used BEFORE game starts
          lobbies[data.lobby] = {
             name: data.lobby,
             players: [
@@ -116,16 +125,30 @@ io.on('connection', (socket) => {
       if(socket.id != lobbies[lobbyName].host.id)
          return io.to(socket.id).emit("error", "Nice try :)");
       
+      // ensure at least 2 players
       if(lobbies[lobbyName].players.length == 1) {
          return io.to(socket.id).emit("error", "At least 2 players required!");
       }
       
       console.log(`Lobby '${lobbyName}' started!`);
 
+      // reference object
+      var lobby = lobbies[lobbyName]
+
+      // update lobby object to include game specific data
+      lobby.started = true;
+      lobby.matches = [];
+      lobby.currentMatch = 0;
+      lobby.currentWinners = [];
+      lobby.transcript = "";
+      lobbies[lobbyName].messages = [
+         NewMessage("The game begins!")
+      ]
+
       // set up matches
-      var playerPool = [...lobbies[lobbyName].players]
-      var matches = [];
-      // shuffle player pool
+
+      // randomly shuffled list of all players
+      var playerPool = [...lobby.players]
       for(var i = 0; i < playerPool.length; i++) {
          var target = Math.floor(Math.random() * (playerPool.length - 1));
 
@@ -134,33 +157,41 @@ io.on('connection', (socket) => {
          playerPool[i] = temp;
       }
 
-      // random advances if odd number
-      lobbies[lobbyName].currentWinners = (playerPool.length % 2 == 1) ? [playerPool.pop()] : [];
-
-      for(var i = 0; i < playerPool.length; i += 2) {
-         matches.push(NewMatch([playerPool[i], playerPool[i + 1]]))
+      // random player advances if odd number of players
+      if(playerPool.length % 2 == 1) {
+         lobby.currentWinners.push(playerPool.pop());
+         lobby.messages.push(NewMessage("With an odd number of players, a random player was moved to the next set of matches."))
       }
-      
-      lobbies[lobbyName].started = true;
-      lobbies[lobbyName].matches = matches;
-      lobbies[lobbyName].currentMatch = 0;
-      lobbies[lobbyName].messages = [
-         NewMessage("The game begins!"),
-         NewMessage(lobbies[lobbyName].matches[lobbies[lobbyName].currentMatch].players[0].name + " vs " + lobbies[lobbyName].matches[lobbies[lobbyName].currentMatch].players[1].name + " has begun!")
-      ]
 
+      // set up first round of matches using random list
+      for(var i = 0; i < playerPool.length; i += 2) {
+         lobby.matches.push(NewMatch([playerPool[i], playerPool[i + 1]]))
+      }
+
+      // announce first battle
+      NewMessage(lobby.matches[lobby.currentMatch].players[0].name + " vs " + lobby.matches[lobby.currentMatch].players[1].name + " has begun!")
+      
+      // update all players & alert start of game
       lobbies[lobbyName].players.forEach(p => {
+         // alert player who is sitting out
+         if(lobbies[lobbyName].currentWinners.includes(p)) {
+            io.to(p.id).emit("error", "With an odd number of players, you were moved to the next set of matches.");
+         }
+         
          io.to(p.id).emit("lobby-update", lobbies[lobbyName]);
          io.to(p.id).emit("start-game");
-
-         if(lobbies[lobbyName].currentWinners.includes(p)) {
-            io.to(p.id).emit("error", "With an odd number of players, you were moved to the next seed.");
-         }
       })
    })
 
+   // fires when player chooses something in combat
    socket.on("choose", ({lobbyName, choice}) => {
-      var currentMatch = lobbies[lobbyName].matches[lobbies[lobbyName].currentMatch];
+      // make sure matches exist
+      if(lobbies[lobbyName].matches && lobbies[lobbyName].matches.length == 0)
+         return;
+
+      // references
+      var lobby = lobbies[lobbyName];
+      var currentMatch = lobby.matches[lobby.currentMatch];
 
       // check if player is actually in the match
       if(socket.id != currentMatch.players[0].id && socket.id != currentMatch.players[1].id) {
@@ -172,6 +203,7 @@ io.on('connection', (socket) => {
          return io.to(socket.id).emit("error", "Invalid response!");
       }
 
+      // current player between the 2 battling
       var index = (socket.id == currentMatch.players[0].id) ? 0 : 1;
 
       // ignore if player is spamming same choice
@@ -179,22 +211,24 @@ io.on('connection', (socket) => {
          return;
       }
 
+      // update database
       currentMatch.choices[index] = choice;
 
       console.log(`Player ${currentMatch.players[index].name} chose ${choice}`);
 
-      lobbies[lobbyName].messages.push(NewMessage(`${currentMatch.players[index].name} made their choice.`));
-      lobbies[lobbyName].players.forEach(p => {
-         io.to(p.id).emit("new-message", lobbies[lobbyName].messages);
+      // alert all other players of choice
+      lobby.messages.push(NewMessage(`${currentMatch.players[index].name} made their choice.`));
+      lobby.players.forEach(p => {
+         io.to(p.id).emit("new-message", lobby.messages);
       })
 
       // if both players have chosen
       if(currentMatch.choices.filter(c => c == "").length == 0) {
          // both players chose the same, match is a draw!
          if(currentMatch.choices[0] == currentMatch.choices[1]) {
-            lobbies[lobbyName].messages.push(NewMessage("Match was a draw!"));
-            lobbies[lobbyName].players.forEach(p => {
-               io.to(p.id).emit("lobby-update", lobbies[lobbyName]);
+            lobby.messages.push(NewMessage("Match was a draw!"));
+            lobby.players.forEach(p => {
+               io.to(p.id).emit("lobby-update", lobby);
             })
 
          } else {    // if it is a not a draw...
@@ -217,65 +251,76 @@ io.on('connection', (socket) => {
             // if they hit the target wins they win the match!
             if(currentMatch.wins[winner] == currentMatch.targetWins) {
                // go to next match & add player to winners
-               lobbies[lobbyName].currentMatch += 1;
-               lobbies[lobbyName].currentWinners.push(currentMatch.players[winner])
+               lobby.currentMatch += 1;
+               lobby.currentWinners.push(currentMatch.players[winner])
 
-               lobbies[lobbyName].messages.push(NewMessage(currentMatch.players[winner].name + " has won the match!"));
+               lobby.messages.push(NewMessage(currentMatch.players[winner].name + " has won the match!"));
 
                // if that was the final match of the tier, then check some things
-               if(lobbies[lobbyName].currentMatch == lobbies[lobbyName].matches.length) {
-                  lobbies[lobbyName].currentMatch = 0;
+               if(lobby.currentMatch == lobby.matches.length) {
+                  lobby.currentMatch = 0;
                   
                   // if last person left, winner ! game is over.
-                  if(lobbies[lobbyName].currentWinners.length == 1) {
-                     lobbies[lobbyName].winners = {
+                  if(lobby.currentWinners.length == 1) {
+                     lobby.winners = {
                         first: currentMatch.players[winner],
                         second: currentMatch.players[(winner == 0) ? 1 : 0]
                      }
 
-                     lobbies[lobbyName].players.forEach(p => {
-                        io.to(p.id).emit("lobby-update", lobbies[lobbyName]);
+                     lobby.messages.push(NewMessage("The tournament is over."));
+                     lobby.messages.push(NewMessage(currentMatch.players[winner].name + " is victorious!"));
+
+                     var transcript = "";
+                     [...lobby.messages].reverse().forEach(msg => {
+                        console.log(msg.content + "\n");
+                        transcript += msg.content + "\n"
+                     })
+
+                     lobby.transcript = transcript;
+                     lobby.players.forEach(p => {
+                        io.to(p.id).emit("lobby-update", lobby);
                         io.to(p.id).emit("end-game");
                      })
                   } else {
                      // otherwise continue to next seed! make new matches
-                     lobbies[lobbyName].matches = []
+                     lobby.matches = []
 
                      // same as before, if odd number 1 random person advances
                      var advancingPlayer = null;
-                     if(lobbies[lobbyName].currentWinners.length % 2 == 1) {
+                     if(lobby.currentWinners.length % 2 == 1) {
                         console.log("odd number of players! picking random to advance...");
-                     lobbies[lobbyName].messages.push(NewMessage("Given the odd number of players, a random player was chosen to advance to the next tier..."));
-                        advancingPlayer = lobbies[lobbyName].currentWinners[0]
-                        lobbies[lobbyName].currentWinners = lobbies[lobbyName].currentWinners.filter(w => w != advancingPlayer);
+                        lobby.messages.push(NewMessage("Given the odd number of players, a random player was chosen to advance to the next tier..."));
+                        advancingPlayer = lobby.currentWinners[0]
+                        lobby.currentWinners = lobby.currentWinners.filter(w => w != advancingPlayer);
                      }
 
-                     for(var i = 0; i < lobbies[lobbyName].currentWinners.length; i+= 2) {
-                        var targetWins = (lobbies[lobbyName].currentWinners.length == 2 && advancingPlayer == null) ? 3 : 2
-                        lobbies[lobbyName].matches.push(NewMatch([lobbies[lobbyName].currentWinners[i], lobbies[lobbyName].currentWinners[i + 1]], targetWins))
+                     for(var i = 0; i < lobby.currentWinners.length; i+= 2) {
+                        var targetWins = (lobby.currentWinners.length == 2 && advancingPlayer == null) ? 3 : 2
+                        lobby.matches.push(NewMatch([lobby.currentWinners[i], lobby.currentWinners[i + 1]], targetWins))
                      }
 
-                     lobbies[lobbyName].currentWinners = [];
+                     lobby.currentWinners = [];
                      if(advancingPlayer != null)
-                        lobbies[lobbyName].currentWinners.push(advancingPlayer);
+                        lobby.currentWinners.push(advancingPlayer);
 
-                     lobbies[lobbyName].players.forEach(p => {
+                     lobby.players.forEach(p => {
                         if(advancingPlayer == p) {
                            io.to(p.id).emit("error", "With an odd number of players, you will sit out this seed and play in the next.");
                         }
-                        io.to(p.id).emit("lobby-update", lobbies[lobbyName]);
+                        io.to(p.id).emit("lobby-update", lobby);
                      })
                   }
                }
 
-               lobbies[lobbyName].messages.push(NewMessage(lobbies[lobbyName].matches[lobbies[lobbyName].currentMatch].players[0].name + " vs " + lobbies[lobbyName].matches[lobbies[lobbyName].currentMatch].players[1].name + " has begun!"))
+               if(lobby.matches.length > 0)
+                  lobby.messages.push(NewMessage(lobby.matches[lobby.currentMatch].players[0].name + " vs " + lobby.matches[lobby.currentMatch].players[1].name + " has begun!"))
             } else {
-               lobbies[lobbyName].messages.push(NewMessage(currentMatch.players[winner].name + " won the round! (" + currentMatch.wins[winner] + "/" + currentMatch.targetWins + ")"));
+               lobby.messages.push(NewMessage(currentMatch.players[winner].name + " won the round! (" + currentMatch.wins[winner] + "/" + currentMatch.targetWins + ")"));
             }
 
             // now alert players
-            lobbies[lobbyName].players.forEach(p => {
-               io.to(p.id).emit("lobby-update", lobbies[lobbyName]);
+            lobby.players.forEach(p => {
+               io.to(p.id).emit("lobby-update", lobby);
             })
          }
          currentMatch.choices = [
