@@ -5,6 +5,19 @@
          <Lobby v-if="inLobby" @begin="Begin" :lobby="lobby" :selfID="userSocket.id"/>
       </div>
       <div v-if="lobbyStarted">
+         <div class="game">
+            <div v-for="i in lobby.matches" :key="i.players[0].id">
+               {{i.players[0].name + (i.players[0].id == userSocket.id ? " (you)" : "")}} vs {{i.players[1].name + (i.players[1].id == userSocket.id ? " (you)" : "")}}
+               {{(i == lobby.matches[lobby.currentMatch]) ? "(current)" : ""}}
+            </div>
+            <div v-if="userSocket.id == lobby.matches[lobby.currentMatch].players[0].id || userSocket.id == lobby.matches[lobby.currentMatch].players[1].id">
+               <div class="options-box">
+                  <button class="option" @click="Select('rock')">🪨</button>
+                  <button class="option" @click="Select('paper')">📜</button>
+                  <button class="option" @click="Select('scissor')">✂️</button>
+               </div>
+            </div>
+         </div>
       </div>
       <ErrorMessage v-if="errorMessage != ''" @resetError="ResetError" :errorMessage="errorMessage" />
    </div>
@@ -25,7 +38,8 @@ export default {
       Login
    },
    setup() {
-      const ENDPOINT = "https://tteok-rps.herokuapp.com/"
+      const DEBUG = false;
+      const ENDPOINT = DEBUG ? "http://localhost:3000" : "https://tteok-rps.herokuapp.com/"
 
       var errorMessage = ref("");      // text error message, displays when not blank
 
@@ -64,6 +78,7 @@ export default {
 
          userSocket.value.on("start-game", () => {
             lobbyStarted.value = true;
+            console.log(lobby.value);
          })
       }
 
@@ -73,6 +88,11 @@ export default {
 
       function ResetError() {
          errorMessage.value = "";
+      }
+
+      function Select(_choice) {
+         console.log("attempting to choose...");
+         userSocket.value.emit("choose", {lobbyName: lobby.value.name, choice: _choice});
       }
 
       return {
@@ -87,6 +107,8 @@ export default {
          Connect,
          Begin,
          ResetError,
+
+         Select,
       }
    }
 }
@@ -110,6 +132,10 @@ export default {
    align-items: center;
 
    background-color: rgb(42, 42, 42);
+}
+
+.game {
+   color: white;
 }
 
 </style>
