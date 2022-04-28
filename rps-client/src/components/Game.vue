@@ -65,6 +65,21 @@ export default {
 </script>
 
 <style scoped>
+@media only screen and (max-width: 600px) {
+   .game-info {
+      grid-template-columns: 1fr !important;
+   }
+
+   .game {
+      width: 300px !important;
+      height: 500px !important;
+   }
+
+   .game-option {
+      
+   }
+}
+
 .game {
    display: flex;
    flex-direction: column;

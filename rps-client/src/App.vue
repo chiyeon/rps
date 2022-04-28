@@ -1,8 +1,21 @@
 <template>
    <div class="app">
-      <div v-if="!lobbyStarted">
+      <div class="lobby-setting" v-if="!lobbyStarted">
+         <div class="title">
+         <pre class="title">___ ___  ___                        
+| _ \ _ \/ __|                       
+|   /  _/\__ \                       
+|_|_\_|__|___/  _ ___ _  _ _____   __
+|_   _/ _ \| | | | _ \ \| | __\ \ / /
+  | || (_) | |_| |   / .` | _| \ V / 
+|_| \___/ \___/|_|_\_|\_|___| |_|</pre>
+         <br>
+         </div>
          <Login v-if="!inLobby" @connect="Connect" />
          <Lobby v-if="inLobby" @begin="Begin" :lobby="lobby" :selfID="userSocket.id"/>
+         <div class="version-info">
+            Ver. {{VERSION}} on {{DEBUG ? "Test Server" : "Live Server"}}
+         </div>
       </div>
       <Game
          v-if="lobbyStarted"
@@ -37,8 +50,10 @@ export default {
       Game
    },
    setup() {
-      const DEBUG = false;
-      const ENDPOINT = DEBUG ? "http://localhost:3000" : "https://tteok-rps.herokuapp.com/"
+      const VERSION = ref("a1.1");
+
+      const DEBUG = ref(false);
+      const ENDPOINT = DEBUG.value ? "http://localhost:3000" : "https://tteok-rps.herokuapp.com/"
 
       var errorMessage = ref("");      // text error message, displays when not blank
       var userChoice = ref("");        // rock, paper, or scissor (whichever user chosen)
@@ -109,6 +124,9 @@ export default {
       }
 
       return {
+         VERSION,
+         DEBUG,
+
          errorMessage,
          userChoice,
 
@@ -153,6 +171,29 @@ export default {
    align-items: center;
 
    background-color: var(--background-1);
+}
+
+.title {
+   text-align: center;
+   color: var(--foreground-1);
+   
+}
+
+.version-info {
+   color: var(--foreground-1);
+   position: fixed;
+   left: 50%;
+   bottom: 1%;
+   text-align: center;
+   transform: translateX(-50%);
+}
+
+.lobby-setting {
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: center;
+   padding-bottom: 75px;
 }
 
 </style>
