@@ -2,7 +2,7 @@
    <div class="app">
       <div class="lobby-setting" v-if="!lobbyStarted">
          <div class="title">
-         <pre class="title">___ ___  ___                        
+         <pre class="title"> ___ ___  ___                        
 | _ \ _ \/ __|                       
 |   /  _/\__ \                       
 |_|_\_|__|___/  _ ___ _  _ _____   __

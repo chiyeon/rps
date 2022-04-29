@@ -3,7 +3,7 @@
       <div v-if="!gameOver" class="game">
          <div class="game-info">
             <div class="game-info-matches">
-               <div>Matches this Seed:</div>
+               <div>Matches this Set:</div>
                <div v-for="i in lobby.matches" :key="i.players[0].id">
                   {{i.players[0].name + (i.players[0].id == userSocket.id ? " (you)" : "")}} vs {{i.players[1].name + (i.players[1].id == userSocket.id ? " (you)" : "")}}
                   {{(i == lobby.matches[lobby.currentMatch]) ? "(current)" : ""}}
@@ -116,12 +116,13 @@ export default {
 }
 
 .game-options {
+   width: 100%;
+
    flex: 1;
    display: flex;
    flex-direction: row;
 
    border-radius: 10px;
-   padding: 10px;
 
    background-color: var(--background-2);
 }

@@ -63,8 +63,8 @@ io.on('connection', (socket) => {
       console.log(`connection from ${data.name}`)
 
       // check if name is valid
-      if(data.name.length > 10) {
-         return io.to(data.id).emit("error", "Name is too long (>10 characters)");
+      if(data.name.length > 16) {
+         return io.to(data.id).emit("error", "Name is too long (>16 characters)");
       }
 
       // TODO check profanity?
