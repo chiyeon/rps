@@ -75,8 +75,8 @@ export default {
       height: 500px !important;
    }
 
-   .game-option {
-      
+   .game-options {
+      width: 300px !important;
    }
 }
 
@@ -116,7 +116,7 @@ export default {
 }
 
 .game-options {
-   width: 100%;
+   width: 500px;
 
    flex: 1;
    display: flex;

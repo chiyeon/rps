@@ -50,7 +50,7 @@ export default {
       Game
    },
    setup() {
-      const VERSION = ref("a1.1");
+      const VERSION = ref("a1.11");
 
       const DEBUG = ref(false);
       const ENDPOINT = DEBUG.value ? "http://localhost:3000" : "https://tteok-rps.herokuapp.com/"
