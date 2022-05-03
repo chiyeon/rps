@@ -20,9 +20,9 @@
          </div>
          
          <div class="game-options" v-if="lobby.matches.length > 0 && userSocket.id == lobby.matches[lobby.currentMatch].players[0].id || userSocket.id == lobby.matches[lobby.currentMatch].players[1].id">
-            <button :class="userChoice == 'rock' ? 'game-option selected' : 'game-option'" @click="Select('rock')">🪨</button>
-            <button :class="userChoice == 'paper' ? 'game-option selected' : 'game-option'" @click="Select('paper')">📜</button>
-            <button :class="userChoice == 'scissor' ? 'game-option selected' : 'game-option'" @click="Select('scissor')">✂️</button>
+            <button :class="userChoice == 'rock' ? 'game-option selected' : 'game-option'" @click="Select('rock')"><img src="../assets/icons/rock.png" /></button>
+            <button :class="userChoice == 'paper' ? 'game-option selected' : 'game-option'" @click="Select('paper')"><img src="../assets/icons/paper.png" /></button>
+            <button :class="userChoice == 'scissor' ? 'game-option selected' : 'game-option'" @click="Select('scissor')"><img src="../assets/icons/scissor.png" /></button>
          </div>
       </div>
       <div v-if="gameOver" class="results">
@@ -78,6 +78,9 @@ export default {
    .game-options {
       width: 300px !important;
    }
+   .game-option {
+      width: 100px !important;
+   }
 }
 
 .game {
@@ -119,8 +122,9 @@ export default {
    width: 500px;
 
    flex: 1;
-   display: flex;
-   flex-direction: row;
+   
+   display: grid;
+   grid-template-columns: 1fr 1fr 1fr;
 
    border-radius: 10px;
 
@@ -128,9 +132,6 @@ export default {
 }
 
 .game-option {
-   flex-grow: 1;
-   font-size: 60px;
-   
    background: none;
    border: none;
 
@@ -139,6 +140,11 @@ export default {
    opacity: 0.3;
 
    transition: opacity 100ms;
+}
+
+.game-option img {
+   width: 80%;
+   padding: 10px;
 }
 
 .game-option:hover {

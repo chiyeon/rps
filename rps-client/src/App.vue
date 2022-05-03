@@ -1,6 +1,26 @@
 <template>
    <div class="app">
-      <div class="lobby-setting" v-if="!lobbyStarted">
+      <div class="game">
+         <div class="game-info">
+            <div class="game-info-matches">
+               <div>Matches this Set:</div>
+               <div>SLDKFJSDKL</div>
+            </div>
+            <div class="game-info-log">
+               <div>Game Transcript:</div>
+               <div class="game-info-log-scroll">
+                  <div>hi</div>
+               </div>
+            </div>
+         </div>
+         
+         <div class="game-options">
+            <button :class="userChoice == 'rock' ? 'game-option selected' : 'game-option'" @click="Select('rock')"><img src="./assets/icons/rock.png" /></button>
+            <button :class="userChoice == 'paper' ? 'game-option selected' : 'game-option'" @click="Select('paper')"><img src="./assets/icons/paper.png" /></button>
+            <button :class="userChoice == 'scissor' ? 'game-option selected' : 'game-option'" @click="Select('scissor')"><img src="./assets/icons/scissor.png" /></button>
+         </div>
+      </div>
+      <!--div class="lobby-setting" v-if="!lobbyStarted">
          <div class="title">
          <pre class="title"> ___ ___  ___                        
 | _ \ _ \/ __|                       
@@ -29,30 +49,30 @@
          v-if="errorMessage != ''"
          @resetError="ResetError"
          :errorMessage="errorMessage" 
-      />
+      /-->
    </div>
 </template>
 
 <script>
 import io from "socket.io-client";
 import { ref } from "vue";
-
+/*
 import ErrorMessage from "./components/ErrorMessage.vue"
 import Lobby from "./components/Lobby.vue"
 import Login from "./components/Login.vue"
-import Game from "./components/Game.vue"
+import Game from "./components/Game.vue"*/
 
 export default {
-   components: {
+   /*components: {
       ErrorMessage,
       Lobby,
       Login,
       Game
-   },
+   },*/
    setup() {
-      const VERSION = ref("a1.11");
+      const VERSION = ref("a1.2");
 
-      const DEBUG = ref(false);
+      const DEBUG = ref(true);
       const ENDPOINT = DEBUG.value ? "http://localhost:3000" : "https://tteok-rps.herokuapp.com/"
 
       var errorMessage = ref("");      // text error message, displays when not blank
@@ -194,6 +214,131 @@ export default {
    justify-content: center;
    align-items: center;
    padding-bottom: 75px;
+}
+
+
+@media only screen and (max-width: 600px) {
+   .game-info {
+      grid-template-columns: 1fr !important;
+   }
+
+   .game {
+      width: 80vw !important;
+      height: 500px !important;
+   }
+
+   .game-options {
+      width: 80vw !important;
+   }
+
+   .game-option {
+      padding: 0%;
+   }
+
+   .game-option img {
+      width: 100% !important;
+   }
+}
+
+.game {
+   display: flex;
+   flex-direction: column;
+   gap: 10px;
+   
+   width: 500px;
+   height: 400px;
+
+   color: var(--foreground-1);
+}
+
+.game-info {
+   display: grid;
+   grid-template-columns: 1fr 1fr;
+   min-height: 0;
+
+   flex: 2;
+
+   border-radius: 10px;
+   padding: 10px;
+
+   background-color: var(--background-2);
+
+}
+
+.game-info-matches {
+   flex: 1;
+   overflow-y: auto;
+}
+
+.game-info-log {
+   flex: 1;
+   overflow-y: auto;
+}
+
+.game-options {
+   width: 500px;
+
+   flex: 1;
+   
+   display: grid;
+   grid-template-columns: 1fr 1fr 1fr;
+
+   border-radius: 10px;
+
+   background-color: var(--background-2);
+}
+
+.game-option {
+   background: none;
+   border: none;
+
+   padding: 15%;
+
+   cursor: pointer;
+
+   opacity: 0.3;
+
+   transition: opacity 100ms;
+}
+
+.game-option img {
+   width: 90%;
+}
+
+.game-option:hover {
+   opacity: 0.7;
+}
+
+.game-option.selected {
+   opacity: 1;
+}
+
+.results {
+   width: 300px;
+   height: 400px;
+
+   padding: 10px;
+   border-radius: 10px;
+
+   background-color: var(--background-2);
+   color: var(--foreground-1);
+
+   display: flex;
+   flex-direction: column;
+}
+
+.results-top {
+   text-align: center;
+   flex: 1;
+}
+
+.results-bottom {
+   flex: 4;
+   overflow-y: auto;
+}
+.results-bottom pre {
+   max-width: 100%;
+   white-space: pre-wrap;
 }
 
 </style>
