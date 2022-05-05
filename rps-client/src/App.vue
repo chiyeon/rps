@@ -1,26 +1,6 @@
 <template>
    <div class="app">
-      <div class="game">
-         <div class="game-info">
-            <div class="game-info-matches">
-               <div>Matches this Set:</div>
-               <div>SLDKFJSDKL</div>
-            </div>
-            <div class="game-info-log">
-               <div>Game Transcript:</div>
-               <div class="game-info-log-scroll">
-                  <div>hi</div>
-               </div>
-            </div>
-         </div>
-         
-         <div class="game-options">
-            <button :class="userChoice == 'rock' ? 'game-option selected' : 'game-option'" @click="Select('rock')"><img src="./assets/icons/rock.png" /></button>
-            <button :class="userChoice == 'paper' ? 'game-option selected' : 'game-option'" @click="Select('paper')"><img src="./assets/icons/paper.png" /></button>
-            <button :class="userChoice == 'scissor' ? 'game-option selected' : 'game-option'" @click="Select('scissor')"><img src="./assets/icons/scissor.png" /></button>
-         </div>
-      </div>
-      <!--div class="lobby-setting" v-if="!lobbyStarted">
+      <div class="lobby-setting" v-if="!lobbyStarted">
          <div class="title">
          <pre class="title"> ___ ___  ___                        
 | _ \ _ \/ __|                       
@@ -43,36 +23,39 @@
          :userSocket="userSocket"
          :userChoice="userChoice"
          :gameOver="gameOver"
+         :matchInfo="matchInfo"
+         :matchResults="matchResults"
+         :tourneyResults="tourneyResults"
          @select="Select"
       />
       <ErrorMessage
          v-if="errorMessage != ''"
          @resetError="ResetError"
          :errorMessage="errorMessage" 
-      /-->
+      />
    </div>
 </template>
 
 <script>
 import io from "socket.io-client";
 import { ref } from "vue";
-/*
+
 import ErrorMessage from "./components/ErrorMessage.vue"
 import Lobby from "./components/Lobby.vue"
 import Login from "./components/Login.vue"
-import Game from "./components/Game.vue"*/
+import Game from "./components/Game.vue"
 
 export default {
-   /*components: {
+   components: {
       ErrorMessage,
       Lobby,
       Login,
-      Game
-   },*/
+      Game,
+   },
    setup() {
       const VERSION = ref("a1.2");
 
-      const DEBUG = ref(true);
+      const DEBUG = ref(false);
       const ENDPOINT = DEBUG.value ? "http://localhost:3000" : "https://tteok-rps.herokuapp.com/"
 
       var errorMessage = ref("");      // text error message, displays when not blank
@@ -81,6 +64,9 @@ export default {
       var inLobby = ref(false);        // are we in lobby or not
       var lobbyStarted = ref(false);   // has lobby started the game yet
       var gameOver = ref(false);       // show end screen or not
+      var matchInfo = ref(null);    // collection of match information
+      var matchResults = ref(null);    // match results, whether end of round or match
+      var tourneyResults = ref(null);  // results at the very end of the tournament
 
       var userSocket = ref(null);      // ref to user socket client object
       var lobby = ref(null);           // ref to lobby object
@@ -121,13 +107,30 @@ export default {
             lobbyStarted.value = true;
          })
 
-         userSocket.value.on("end-game", () => {
+         userSocket.value.on("end-game", (_results) => {
             gameOver.value = true;
+            tourneyResults.value = _results;
          })
 
          userSocket.value.on("new-message", messages => {
             lobby.value.messages = messages;
          });
+
+         userSocket.value.on("match-start", ({players, targetWins}) => {
+            matchInfo.value = {
+               players: players,
+               targetWins: targetWins
+            }
+         });
+
+         userSocket.value.on("match-results", ({players, choices, winner, targetWins}) => {
+            matchResults.value = {
+               players: players,
+               choices: choices,
+               winner: winner,
+               targetWins: targetWins
+            }
+         })
       }
 
       function Begin() {
@@ -153,6 +156,9 @@ export default {
          inLobby,
          lobbyStarted,
          gameOver,
+         matchInfo,
+         matchResults,
+         tourneyResults,
 
          userSocket,
          lobby,
@@ -214,131 +220,6 @@ export default {
    justify-content: center;
    align-items: center;
    padding-bottom: 75px;
-}
-
-
-@media only screen and (max-width: 600px) {
-   .game-info {
-      grid-template-columns: 1fr !important;
-   }
-
-   .game {
-      width: 80vw !important;
-      height: 500px !important;
-   }
-
-   .game-options {
-      width: 80vw !important;
-   }
-
-   .game-option {
-      padding: 0%;
-   }
-
-   .game-option img {
-      width: 100% !important;
-   }
-}
-
-.game {
-   display: flex;
-   flex-direction: column;
-   gap: 10px;
-   
-   width: 500px;
-   height: 400px;
-
-   color: var(--foreground-1);
-}
-
-.game-info {
-   display: grid;
-   grid-template-columns: 1fr 1fr;
-   min-height: 0;
-
-   flex: 2;
-
-   border-radius: 10px;
-   padding: 10px;
-
-   background-color: var(--background-2);
-
-}
-
-.game-info-matches {
-   flex: 1;
-   overflow-y: auto;
-}
-
-.game-info-log {
-   flex: 1;
-   overflow-y: auto;
-}
-
-.game-options {
-   width: 500px;
-
-   flex: 1;
-   
-   display: grid;
-   grid-template-columns: 1fr 1fr 1fr;
-
-   border-radius: 10px;
-
-   background-color: var(--background-2);
-}
-
-.game-option {
-   background: none;
-   border: none;
-
-   padding: 15%;
-
-   cursor: pointer;
-
-   opacity: 0.3;
-
-   transition: opacity 100ms;
-}
-
-.game-option img {
-   width: 90%;
-}
-
-.game-option:hover {
-   opacity: 0.7;
-}
-
-.game-option.selected {
-   opacity: 1;
-}
-
-.results {
-   width: 300px;
-   height: 400px;
-
-   padding: 10px;
-   border-radius: 10px;
-
-   background-color: var(--background-2);
-   color: var(--foreground-1);
-
-   display: flex;
-   flex-direction: column;
-}
-
-.results-top {
-   text-align: center;
-   flex: 1;
-}
-
-.results-bottom {
-   flex: 4;
-   overflow-y: auto;
-}
-.results-bottom pre {
-   max-width: 100%;
-   white-space: pre-wrap;
 }
 
 </style>

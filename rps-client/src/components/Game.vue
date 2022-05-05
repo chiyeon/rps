@@ -25,6 +25,20 @@
             <button :class="userChoice == 'scissor' ? 'game-option selected' : 'game-option'" @click="Select('scissor')"><img src="../assets/icons/scissor.png" /></button>
          </div>
       </div>
+      <MatchResults
+         :info="matchResults"
+         @close="CloseMatchResults"
+         v-if="showMatchResults"
+      />
+      <MatchInfo 
+         :info="matchInfo" 
+         @close="CloseInfo"
+         v-if="showMatchInfo" 
+      />
+      <TourneyResults
+         :lobby="lobby"
+         v-if="gameOver"
+      />
       <div v-if="gameOver" class="results">
          <div class="results-top">
             <div>Game is Over!</div>
@@ -42,23 +56,62 @@
 </template>
 
 <script>
+import { ref, watch } from "vue"
+
+import MatchResults from "./MatchResults.vue"
+import MatchInfo from "./MatchInfo.vue"
+import TourneyResults from "./TourneyResults.vue"
+
 export default {
+   components: {
+      MatchResults,
+      MatchInfo,
+      TourneyResults
+   },
    props: {
       lobby: Object,
       userSocket: Object,
       userChoice: String,
-      gameOver: Boolean
+      gameOver: Boolean,
+      matchInfo: Object,
+      matchResults: Object,
+      tourneyResults: Object
    },
    emits: [
       "select"
    ],
    setup(props, {emit}) {
+      const showMatchResults = ref(false);
+      const showMatchInfo = ref(false);
+
+      watch(() => props.matchInfo, () => {
+         showMatchInfo.value = true;
+      })
+
+      watch(() => props.matchResults, () => {
+         showMatchResults.value = true;
+         showMatchInfo.value = false;
+      })
+
       function Select(_choice) {
          emit("select", _choice);
       }
 
+      function CloseInfo() {
+         showMatchInfo.value = false
+      }
+
+      function CloseMatchResults() {
+         showMatchResults.value = false;
+      }
+
       return {
-         Select
+         showMatchResults,
+         showMatchInfo,
+
+         Select,
+         CloseInfo,
+         CloseMatchResults
       }
    }
 }
@@ -71,15 +124,20 @@ export default {
    }
 
    .game {
-      width: 300px !important;
+      width: 80vw !important;
       height: 500px !important;
    }
 
    .game-options {
-      width: 300px !important;
+      width: 80vw !important;
    }
+
    .game-option {
-      width: 100px !important;
+      padding: 0%;
+   }
+
+   .game-option img {
+      width: 100% !important;
    }
 }
 
@@ -135,6 +193,8 @@ export default {
    background: none;
    border: none;
 
+   padding: 15%;
+
    cursor: pointer;
 
    opacity: 0.3;
@@ -143,8 +203,7 @@ export default {
 }
 
 .game-option img {
-   width: 80%;
-   padding: 10px;
+   width: 90%;
 }
 
 .game-option:hover {
