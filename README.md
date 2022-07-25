@@ -1,8 +1,15 @@
-# rps tournament
-[**rps tournament**](https://tteok-rps.herokuapp.com/) is a full stack Rock Paper Scissors tournament application.
+![](previews/rps_1.png)
 
-With a backend powered by express & socket.io, players can interact with the Vue3 powered frontend to create, join, and leave lobbies with as many players as they need, choosing custom names & entering any lobbies they wish. 
+[**RPS Tourney**](https://tteok-rps.herokuapp.com/) is a minimal Rock Paper Scissors tournament web game, with a ReactJS client and an Express, Socket.js powered Node serverside, deployed on Heroku.
 
-Once a lobby is chosen, the host and only the host can freely start whenever, a role that is automatically migrated to others when necessary.
+### Overview
 
-After the tournament starts, matches are randomly created for each tier, up till the Finals. At any point if there is an odd number of players, one player will be randomly moved up to the next tier.
+The full stack application has a minimal interface, and is easy to use for all players. Creating or joining lobbies is as simple as entering a unique lobby name & lobby-unique name.
+
+Once in a lobby, a tournament is started between players, with randomly created bracketing tiers that automatically scale based on the present number of players, odd or even. Players who win their best of 3, 1v1 game advance to the next set, until only 2 remain, the winner of which is decided in a best of 5.
+
+
+### Previews
+![](previews/rps_2.png)
+![](previews/rps_3.png)
+![](previews/rps_4.png)
