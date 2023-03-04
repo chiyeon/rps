@@ -3,12 +3,16 @@ var http = require('http');
 const cors = require("cors");
 const path = require("path");
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 25565;
 const VERSION = "1.1";
 
 var app = express();
 const server = http.createServer(app);
-var io = require('socket.io')(server);
+var io = require('socket.io')(server, {
+   cors: {
+      origin: "*",
+   },
+});
 
 app.use(cors());
 
