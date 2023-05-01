@@ -1,6 +1,10 @@
 <template>
    <div class="app">
       <div class="lobby-setting" v-if="!lobbyStarted">
+         <div v-if="loading" class="loading-screen">
+            <p>Loading...</p>
+            <p class="hint">May take a moment for servers to start.</p>
+         </div>
          <div class="title">
          <pre class="title"> ___ ___  ___                        
 | _ \ _ \/ __|                       
@@ -53,7 +57,7 @@ export default {
       Game,
    },
    setup() {
-      const VERSION = ref("a1.2");
+      const VERSION = ref("a1.3");
 
       const DEBUG = ref(false);
       const ENDPOINT = DEBUG.value ? "http://localhost:3000" : "https://rps-tourney.onrender.com"
@@ -67,6 +71,7 @@ export default {
       var matchInfo = ref(null);    // collection of match information
       var matchResults = ref(null);    // match results, whether end of round or match
       var tourneyResults = ref(null);  // results at the very end of the tournament
+      var loading = ref(false)      // are we loading scren
 
       var userSocket = ref(null);      // ref to user socket client object
       var lobby = ref(null);           // ref to lobby object
@@ -77,6 +82,11 @@ export default {
             return;
          }
 
+         if (loading.value) return;
+
+         // show loading screen
+         loading.value = true
+
          userSocket.value = io(ENDPOINT);
 
          // update local copy of lobby
@@ -84,6 +94,7 @@ export default {
             inLobby.value = true;
             lobby.value = _lobby;
             userChoice.value = "";
+            loading.value = false
          })
 
          // send login req on successful connection
@@ -159,6 +170,7 @@ export default {
          matchInfo,
          matchResults,
          tourneyResults,
+         loading,
 
          userSocket,
          lobby,
@@ -220,6 +232,26 @@ export default {
    justify-content: center;
    align-items: center;
    padding-bottom: 75px;
+}
+
+.loading-screen {
+   position: fixed;
+   z-index: 10;
+   width: 100vw;
+   height: 100vh;
+
+   background-color: #272727;
+
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   flex-direction: column;
+
+   color: white;
+}
+
+.loading-screen .hint {
+   font-style: italic;
 }
 
 </style>
