@@ -59,7 +59,7 @@ export default {
    setup() {
       const VERSION = ref("a1.3");
 
-      const DEBUG = ref(true);
+      const DEBUG = ref(false);
       const ENDPOINT = DEBUG.value ? "http://localhost:25565" : "https://rps-tourney.onrender.com"
 
       var errorMessage = ref("");      // text error message, displays when not blank
