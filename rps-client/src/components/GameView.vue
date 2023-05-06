@@ -14,14 +14,14 @@
          <div v-else class="game-info">
             <div class="game-info-matches">
                <h2>Up Next</h2>
-               <p v-for="i in lobby.matches" :key="i.players[0].id" v-if="i != lobby.matches[lobby.currentMatch]">
+               <p v-for="i in lobby.matches" :key="i.players[0].id">
                   {{ i.players[0].name + (i.players[0].id == userSocket.id ? " (you)" : "")}} vs {{i.players[1].name + (i.players[1].id == userSocket.id ? " (you)" : "") }}
                </p>
             </div>
             <div class="game-info-log">
                <h2>Game Transcript:</h2>
                <div class="game-info-log-scroll" ref="matchTranscript">
-                  <p v-for="message in lobby.messages" :key="message.id">
+                  <p v-for="message in [...lobby.messages]" :key="message.id">
                      {{message.content}}
                   </p>
                </div>
@@ -42,7 +42,7 @@
          :lobby="lobby"
          v-if="gameOver"
       />
-      <div v-if="gameOver" class="results">
+      <!-- <div v-if="gameOver" class="results">
          <div class="results-top">
             <div>Game is Over!</div>
             <br>
@@ -54,102 +54,85 @@
             <pre class="transcript">{{lobby.transcript}}
             </pre>
          </div>
-      </div>
+      </div> -->
    </div>
 </template>
 
-<script>
-import { ref, watch } from "vue"
+<script setup>
+import { ref, watch, defineEmits, defineProps, nextTick } from "vue"
 
 import MatchResults from "./MatchResults.vue"
 import MatchInfo from "./MatchInfo.vue"
 import TourneyResults from "./TourneyResults.vue"
 
-export default {
-   components: {
-      MatchResults,
-      MatchInfo,
-      TourneyResults
-   },
-   props: {
-      lobby: Object,
-      userSocket: Object,
-      userChoice: String,
-      gameOver: Boolean,
-      matchInfo: Object,
-      matchResults: Object,
-      tourneyResults: Object
-   },
-   emits: [
-      "select"
-   ],
-   setup(props, {emit}) {
-      const showMatchResults = ref(false);
-      const showMatchInfo = ref(false);
-      const showGame = ref(false)
-      const matchTranscript = ref(null)
+const props = defineProps([
+   "lobby",
+   "userSocket",
+   "userChoice",
+   "gameOver",
+   "matchInfo",
+   "matchResults",
+   "tourneyResults"
+])
 
-      watch(() => props.matchInfo, () => {
-         showMatchInfo.value = true;
-      })
+const emit = defineEmits([
+   "select"
+])
 
-      watch(() => props.matchResults, () => {
-         showMatchResults.value = true;
-         showMatchInfo.value = false;
-      })
+const showMatchResults = ref(false);
+const showMatchInfo = ref(false);
+const showGame = ref(false)
+const matchTranscript = ref()
 
-      watch(() => props.lobby.messages, () => {
-         matchTranscript.value.scrollTop = matchTranscript.value.scrollHeight
-      })
+watch(() => props.matchInfo, () => {
+   showMatchInfo.value = true;
+})
 
-      function Select(_choice) {
-         emit("select", _choice);
-      }
+watch(() => props.matchResults, () => {
+   showMatchResults.value = true;
+   showMatchInfo.value = false;
+})
 
-      function CloseInfo() {
-         showMatchInfo.value = false
-         showGame.value = true;
-      }
+watch(() => props.lobby.messages, async () => {
+   await nextTick()
+   if (matchTranscript.value) matchTranscript.value.scrollTop = matchTranscript.value.scrollHeight;
+})
 
-      function CloseMatchResults() {
-         showMatchResults.value = false;
-      }
+function Select(_choice) {
+   emit("select", _choice);
+}
 
-      return {
-         showMatchResults,
-         showMatchInfo,
+function CloseInfo() {
+   showMatchInfo.value = false
+   showGame.value = true;
+}
 
-         Select,
-         CloseInfo,
-         CloseMatchResults
-      }
-   }
+function CloseMatchResults() {
+   showMatchResults.value = false;
 }
 </script>
 
 <style scoped>
 @media only screen and (max-width: 600px) {
    .game-info {
-      grid-template-rows: 150px 450px !important;
-   }
-   
-   .versus {
-      margin-top: 20px !important;
+      
    }
 }
 
 .game {
    display: flex;
    flex-direction: column;
+   max-height: 95vh;
    gap: 10px;
 
    color: var(--foreground-1);
 }
 
 .game-info {
-   display: grid;
-   grid-template-rows: 200px 500px;
-   min-height: 0;
+   display: flex;
+   flex-direction: column;
+   min-height: 300px;
+   height: 100%;
    max-width: 500px;
    margin: auto;
 
@@ -171,9 +154,15 @@ export default {
 }
 
 .game-info-log {
-   flex: 1;
-   overflow-y: auto;
+   flex: 4;
 }
+
+.game-info-log-scroll {
+   overflow-y: auto;
+   max-height: 500px;
+}
+
+/* magic number 33 = height of the game transcript h2 */
 
 .game-options {
    max-width: calc(130px * 3);
@@ -266,5 +255,9 @@ export default {
 .versus > h1 {
    margin: 0;
    font-size: 36px !important;
+}
+
+h2 {
+   margin: 0;
 }
 </style>

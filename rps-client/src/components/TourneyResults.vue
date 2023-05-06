@@ -5,7 +5,7 @@
             <div class="winner"><img class="crown" src="../assets/imgs/crown.png" /><div>{{lobby.winners.first.name}}</div></div>
             <div class="honored">{{lobby.winners.second.name}}</div>
          </div>
-         <img class="platform-img" src="../assets/imgs/crown.png" />
+         <img class="platform-img" src="../assets/imgs/platform.png" />
       </div>
    </div>
 </template>
@@ -57,7 +57,11 @@ export default {
 .crown {
    width: 54px;
    position: absolute;
-   transform: translate(-50%, -85%);
+   transform: translate(-45%, -95%);
+}
+
+img {
+   image-rendering: pixelated;
 }
 
 .winner {

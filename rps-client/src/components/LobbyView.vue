@@ -8,7 +8,7 @@
          </div>
       </div>
       <div class="buttons">
-         <button class="alternative" @click="() => emit('exit')">menu</button>
+         <button class="alternative" @click="() => emit('exit')">quit</button>
          <button :disabled="selfID != lobby.host.id" class="lobby-start" @click="() => emit('begin')">begin</button>
       </div>
    </div>
@@ -45,7 +45,7 @@ const emit = defineEmits([
    max-width: 300px;
    margin: auto;
 
-   max-height: 500px;
+   max-height: 300px;
    overflow-y: auto;
 }
 

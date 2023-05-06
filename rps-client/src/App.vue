@@ -6,6 +6,10 @@
          v-if="!inLobby"
          @connect="Connect"
       />
+      <ChangeLog
+         v-if="openChangelog"
+         @back="() => openChangelog = false"
+      />
       <Lobby
          class="center"
          v-if="inLobby"
@@ -14,9 +18,11 @@
          :lobby="lobby"
          :selfID="userSocket.id"
       />
-      <p class="version-info">
-         Ver. {{VERSION}} {{DEBUG ? "(Testing Server)" : "(Live Server)"}}
-      </p>
+      <div class="version-info"
+      >
+         <p class="changes" @click="() => openChangelog = true">View Changes </p>
+         <p>Ver. {{VERSION}} {{DEBUG ? "(Testing Server)" : "(Live Server)"}}</p>
+      </div>
    </div>
    <Game
       v-if="lobbyStarted"
@@ -42,11 +48,12 @@ import { ref } from "vue";
 
 import ErrorMessage from "./components/ErrorMessage.vue"
 import Lobby from "./components/LobbyView.vue"
+import ChangeLog from "./components/ChangeLog.vue"
 import LoadingView from "./components/LoadingView.vue"
 import Login from "./components/LoginView.vue"
 import Game from "./components/GameView.vue"
 
-const VERSION = ref("1.4");
+const VERSION = ref("2.0");
 
 const DEBUG = ref(false);
 const ENDPOINT = DEBUG.value ? "http://localhost:25565" : "https://rps-tourney.onrender.com"
@@ -61,6 +68,7 @@ var matchInfo = ref(null);    // collection of match information
 var matchResults = ref(null);    // match results, whether end of round or match
 var tourneyResults = ref(null);  // results at the very end of the tournament
 var loading = ref(false)      // are we loading scren
+var openChangelog = ref(false) // are we in changelog
 
 var userSocket = ref(null);      // ref to user socket client object
 var lobby = ref(null);           // ref to lobby object
@@ -141,6 +149,7 @@ function Begin() {
 function QuitLobby() {
    userSocket.value.disconnect()
    inLobby.value = false;
+   
 }
 
 function ResetError() {
@@ -186,7 +195,7 @@ h1 {
    font-size: 48px;
 }
 
-h3, a, pre, p, button, input {
+h3, a, pre, p, button, input, li {
    font-family: "Pixel Arial", monospace;
    color: var(--foreground-1);
 }
@@ -243,6 +252,16 @@ button:hover {
    left: 50%;
    bottom: 10px;
    transform: translateX(-50%);
+
+   text-align: center;
+}
+
+.version-info .changes {
+   cursor: pointer;
+}
+
+.version-info .changes:hover {
+   text-decoration: underline;
 }
 
 .lobby-setting {
