@@ -4,18 +4,19 @@ const cors = require("cors");
 const path = require("path");
 
 const PORT = process.env.PORT || 25565;
-const VERSION = "1.1";
+const VERSION = "1.4";
 
 var app = express();
 const server = http.createServer(app);
 var io = require('socket.io')(server, {
    cors: {
-      origin: "*",
+      origin: '*',
+      methods: ["GET", "POST"]
    },
 });
 
 app.use(cors({
-   origin: "*"
+   origin: '*',
 }));
 
 app.use(express.static(path.resolve(__dirname, "./dist/")))
