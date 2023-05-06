@@ -1,6 +1,6 @@
 <template>
    <div class="error">
-      <div class="error-background"></div>
+      <div class="error-background" @click="ResetError()"></div>
       <div class="error-message">
          <div>{{errorMessage}}</div>
          <button @click="ResetError()">OK</button>
@@ -39,9 +39,10 @@ export default {
    top: 50%;
    transform: translate(-50%, -50%);
 
-   background-color: var(--background-2);
+   background-color: var(--background-1);
    color: var(--foreground-1);
-   border-radius: 10px;
+   border-radius: 4px;
+   border: 2px solid var(--background-2);
 
    display: flex;
    justify-content: center;
@@ -49,7 +50,7 @@ export default {
    flex-direction: column;
    gap: 10px;
 
-   max-width: 200px;
+   max-width: 300px;
 
    z-index: 2;
 }
@@ -75,12 +76,13 @@ export default {
 }
 
 .error-message button {
-   background-color: var(--background-3);
+   background-color: var(--background-2);
    color: var(--foreground-1);
    border: none;
-   border-radius: 0 0 10px 10px;
-   width: 100%;
-   padding: 5px;
+   border-radius: 4px;
+   width: 50px;
+   padding: 4px;
+   margin-bottom: 15px;
 
    cursor: pointer;
 }

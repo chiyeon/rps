@@ -14,7 +14,9 @@ var io = require('socket.io')(server, {
    },
 });
 
-app.use(cors());
+app.use(cors({
+   origin: "*"
+}));
 
 app.use(express.static(path.resolve(__dirname, "./dist/")))
 app.get("*", (req, res) => {

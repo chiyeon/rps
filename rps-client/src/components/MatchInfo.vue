@@ -41,7 +41,7 @@ export default {
    display: flex;
    flex-direction: column;
 
-   position: absolute;
+   position: fixed;
    top: 50%;
    left: 50%;
    transform: translate(-50%, -50%);
@@ -57,11 +57,10 @@ export default {
    opacity: 0.5;
    z-index: 1;
 
-   position: absolute;
+   position: fixed;
 
-   top: 0%;
-   left: 0%;
-   transform: translate(-50%, -50%);
+   top: 0px;
+   left: 0;
    width: 100vw;
    height: 100vh;
 }

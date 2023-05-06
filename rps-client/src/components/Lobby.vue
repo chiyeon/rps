@@ -39,10 +39,11 @@ export default {
 .lobby {
    width: 225px;
    height: 250px;
-   border-radius: 10px;
+   border-radius: 4px;
+   border: 2px solid var(--background-2);
 
    color: var(--foreground-1);
-   background-color: var(--background-2);
+   background-color: var(--background-1);
 
    display: flex;
    flex-direction: column;
@@ -61,12 +62,15 @@ export default {
 
 .lobby-start {
    flex: 0.5;
-   border-radius: 0 0 10px 10px;
+   border-radius: 4px;
+   width: 80px;
+   margin: auto;
+   margin-bottom: 15px;
    cursor: pointer;
    border: none;
 
    border: none;
-   background-color: var(--background-3);
+   background-color: var(--background-2);
    color: var(--foreground-1);
 }
 

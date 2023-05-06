@@ -57,10 +57,10 @@ export default {
       Game,
    },
    setup() {
-      const VERSION = ref("a1.3");
+      const VERSION = ref("a1.4");
 
-      const DEBUG = ref(true);
-      const ENDPOINT = DEBUG.value ? "http://localhost:25565" : "https://rps-tourney.onrender.com"
+      const DEBUG = ref(false);
+      const ENDPOINT = DEBUG.value ? "https://chiyeon-fluffy-spoon-9j67xwg95xg3x6w4-25565.preview.app.github.dev/" : "https://rps-tourney.onrender.com"
 
       var errorMessage = ref("");      // text error message, displays when not blank
       var userChoice = ref("");        // rock, paper, or scissor (whichever user chosen)
@@ -192,10 +192,10 @@ export default {
 }
 
 :root {
-   --background-1: #272727;
-   --background-2: #3f3f3f;
-   --background-3: #5b5b5b;
-   --foreground-1: #ececec;
+   --background-1: #867070;
+   --background-2: #D5B4B4;
+   --background-3: #E4D0D0;
+   --foreground-1: #F5EBEB;
 }
 
 .app {
