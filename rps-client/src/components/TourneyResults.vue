@@ -2,10 +2,10 @@
    <div class="tourney-results">
       <div class="platform">
          <div class="winners">
-            <div class="winner"><img class="crown" src="../assets/crown.png" /><div>{{lobby.winners.first.name}}</div></div>
+            <div class="winner"><img class="crown" src="../assets/imgs/crown.png" /><div>{{lobby.winners.first.name}}</div></div>
             <div class="honored">{{lobby.winners.second.name}}</div>
          </div>
-         <img class="platform-img" src="../assets/platform.png" />
+         <img class="platform-img" src="../assets/imgs/crown.png" />
       </div>
    </div>
 </template>

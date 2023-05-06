@@ -4,7 +4,7 @@
       <div class="match-info">
          <div class="player1">
             <div class="winner">
-               <img v-if="info.winner == 0" src="../assets/crown.png" />
+               <img v-if="info.winner == 0" src="../assets/imgs/crown.png" />
             </div>
             <div class="choice">
                <img :src="GetImage(info.choices[0])" />
@@ -18,7 +18,7 @@
          </div>
          <div class="player2">
             <div class="winner">
-               <img v-if="info.winner == 1" src="../assets/crown.png" />
+               <img v-if="info.winner == 1" src="../assets/imgs/crown.png" />
             </div>
             <div class="choice">
                <img :src="GetImage(info.choices[1])" />
@@ -43,7 +43,7 @@ export default {
       }
 
       function GetImage(choice) {
-         return require(`../assets/icons/${choice}.png`);
+         return require(`../assets/imgs/${choice}.png`);
       }
 
       return {

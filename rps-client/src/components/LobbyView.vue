@@ -1,82 +1,97 @@
 <template>
    <div class="lobby">
-      <div class="lobby-title">In lobby: {{lobby.name}}</div>
+      <h1 class="lobby-title"><span>lobby:</span><br />{{lobby.name}}</h1>
       <div class="lobby-players">
-         <div>Players Connected:</div>
-         <div v-for="player in lobby.players" :key="player.id">
-            {{player.name}}
-            {{lobby.host.id == player.id ? "(host)" : ""}}
-            {{selfID == player.id ? "(you)" : ""}}
+         <div :class="selfID == player.id ? 'player highlight' : 'player'" v-for="player in lobby.players" :key="player.id">
+            <img :class="lobby.host.id == player.id ? 'host-icon' : 'host-icon hidden'" alt="Host" src="../assets/imgs/crown.png" />
+            <p class="name">{{ player.name }} {{selfID == player.id ? "(you)" : ""}}</p>
          </div>
       </div>
-      <button :disabled="selfID != lobby.host.id" class="lobby-start" @click="Begin()">begin</button>
+      <div class="buttons">
+         <button class="alternative" @click="() => emit('exit')">menu</button>
+         <button :disabled="selfID != lobby.host.id" class="lobby-start" @click="() => emit('begin')">begin</button>
+      </div>
    </div>
 </template>
 
-<script>
-export default {
-   props: {
-      lobby: Object,
-      isHost: Boolean,
-      selfID: String
-   },
-   emits: [
-      "begin"
-   ],
-   setup(props, {emit}) {
-      function Begin() {
-         emit("begin");
-      }
+<script setup>
+import { defineProps, defineEmits } from "vue"
 
-      return {
-         Begin,
-      }
-   },
-}
+defineProps([
+   "lobby", "isHost", "selfID"
+])
+
+const emit = defineEmits([
+   "begin",
+   "exit"
+])
 </script>
 
 <style scoped>
 .lobby {
-   width: 225px;
-   height: 250px;
-   border-radius: 4px;
-   border: 2px solid var(--background-2);
-
-   color: var(--foreground-1);
-   background-color: var(--background-1);
-
-   display: flex;
-   flex-direction: column;
-   justify-content: center;
+   margin-top: 100px;
 }
 
 .lobby-title {
-   flex: 0.5;
-   padding: 10px 10px 0 10px;
+   color: var(--foreground-1);
+   text-align: center;
+}
+
+.lobby-title span {
+   color: var(--background-2);
 }
 
 .lobby-players {
-   flex: 3;
-   padding: 0 10px 0 10px;
+   max-width: 300px;
+   margin: auto;
+
+   max-height: 500px;
+   overflow-y: auto;
 }
 
-.lobby-start {
-   flex: 0.5;
-   border-radius: 4px;
-   width: 80px;
+.buttons {
    margin: auto;
-   margin-bottom: 15px;
-   cursor: pointer;
-   border: none;
+   width: fit-content;
+   margin-top: 20px;
+}
 
-   border: none;
-   background-color: var(--background-2);
-   color: var(--foreground-1);
+.buttons button:first-child {
+   margin-right: 10px;
 }
 
 button:disabled {
    opacity: 0.5;
    cursor: not-allowed;
+}
+
+.player {
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   padding: 8px;
+   gap: 6px;
+   background-color: var(--background-1);
+   border: 3px solid var(--background-2);
+   border-radius: 4px;
+   margin-bottom: 5px;
+}
+
+.player.highlight {
+   border: 3px solid var(--background-3);
+}
+
+.player > * {
+   margin: 0;
+}
+
+.player .host-icon {
+   width: 24px;
+   height: 24px;
+   image-rendering: pixelated;
+}
+
+.player .host-icon.hidden {
+   opacity: 0;
 }
 </style>
 

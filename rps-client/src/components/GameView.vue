@@ -1,6 +1,6 @@
 <template>
    <div>
-      <div v-if="!gameOver" class="game">
+      <div v-if="!gameOver && showGame" class="game">
          <div class="game-info">
             <div class="game-info-matches">
                <div>Matches this Set:</div>
@@ -20,20 +20,20 @@
          </div>
          
          <div class="game-options" v-if="lobby.matches.length > 0 && userSocket.id == lobby.matches[lobby.currentMatch].players[0].id || userSocket.id == lobby.matches[lobby.currentMatch].players[1].id">
-            <button :class="userChoice == 'rock' ? 'game-option selected' : 'game-option'" @click="Select('rock')"><img src="../assets/icons/rock.png" /></button>
-            <button :class="userChoice == 'paper' ? 'game-option selected' : 'game-option'" @click="Select('paper')"><img src="../assets/icons/paper.png" /></button>
-            <button :class="userChoice == 'scissor' ? 'game-option selected' : 'game-option'" @click="Select('scissor')"><img src="../assets/icons/scissor.png" /></button>
+            <button :class="userChoice == 'rock' ? 'game-option selected' : 'game-option'" @click="Select('rock')"><img src="../assets/imgs/rock.png" /></button>
+            <button :class="userChoice == 'paper' ? 'game-option selected' : 'game-option'" @click="Select('paper')"><img src="../assets/imgs/paper.png" /></button>
+            <button :class="userChoice == 'scissor' ? 'game-option selected' : 'game-option'" @click="Select('scissor')"><img src="../assets/imgs/scissor.png" /></button>
          </div>
       </div>
-      <MatchResults
-         :info="matchResults"
-         @close="CloseMatchResults"
-         v-if="showMatchResults"
-      />
       <MatchInfo 
          :info="matchInfo" 
          @close="CloseInfo"
          v-if="showMatchInfo" 
+      />
+      <MatchResults
+         :info="matchResults"
+         @close="CloseMatchResults"
+         v-if="showMatchResults"
       />
       <TourneyResults
          :lobby="lobby"
@@ -83,6 +83,7 @@ export default {
    setup(props, {emit}) {
       const showMatchResults = ref(false);
       const showMatchInfo = ref(false);
+      const showGame = ref(false)
 
       watch(() => props.matchInfo, () => {
          showMatchInfo.value = true;
@@ -99,6 +100,7 @@ export default {
 
       function CloseInfo() {
          showMatchInfo.value = false
+         showGame.value = true;
       }
 
       function CloseMatchResults() {

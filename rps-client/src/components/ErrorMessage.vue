@@ -2,29 +2,25 @@
    <div class="error">
       <div class="error-background" @click="ResetError()"></div>
       <div class="error-message">
-         <div>{{errorMessage}}</div>
+         <p>{{errorMessage}}</p>
          <button @click="ResetError()">OK</button>
       </div>
    </div>
 </template>
 
-<script>
-export default {
-   props: {
-      errorMessage: String
-   },
-   emits: [
-      "resetError"
-   ],
-   setup(props, {emit}) {
-      function ResetError() {
-         emit("resetError");
-      }
+<script setup>
+import { defineProps, defineEmits } from "vue"
 
-      return {
-         ResetError,
-      }
-   },
+defineProps([
+   "errorMessage"
+])
+
+const emit = defineEmits([
+   "resetError"
+])
+
+const ResetError = () => {
+   emit("resetError")
 }
 </script>
 
@@ -33,16 +29,21 @@ export default {
    
 }
 
+p {
+   margin-top: 0;
+}
+
 .error-message {
    position: absolute;
    left: 50%;
    top: 50%;
    transform: translate(-50%, -50%);
+   padding: 20px;
 
    background-color: var(--background-1);
    color: var(--foreground-1);
    border-radius: 4px;
-   border: 2px solid var(--background-2);
+   border: 3px solid var(--background-3);
 
    display: flex;
    justify-content: center;
@@ -67,7 +68,7 @@ export default {
    max-height: 100%;
 
    background-color: black;
-   opacity: 0.3;
+   opacity: 0.35;
 }
 
 .error-message div {
@@ -75,15 +76,4 @@ export default {
    word-wrap: break-word;
 }
 
-.error-message button {
-   background-color: var(--background-2);
-   color: var(--foreground-1);
-   border: none;
-   border-radius: 4px;
-   width: 50px;
-   padding: 4px;
-   margin-bottom: 15px;
-
-   cursor: pointer;
-}
 </style>

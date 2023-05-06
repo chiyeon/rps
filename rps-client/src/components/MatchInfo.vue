@@ -1,33 +1,35 @@
 <template>
-   <div class="match-info">
-      <div class="background"></div>
-      <div class="info">
-         <div class="match-type">Best of {{info.targetWins == 2 ? "3" : "5"}}</div>
-         <div class="versus">
-            <div>{{info.players[0].name}}</div>
-            <div>vs</div>
-            <div>{{info.players[1].name}}</div>
-         </div>
+   <div class="match-info" @click="() => emit('close')">
+      <h3 class="match-type">Best of {{info.targetWins == 2 ? "3" : "5"}}</h3>
+      <div class="versus">
+         <h1>{{info.players[0].name}}</h1>
+         <h1 class="vs">vs</h1>
+         <h1>{{info.players[1].name}}</h1>
       </div>
-      <button @click="Close">OKAY</button>
+      <h2 class="timer">{{ remaining_time }}</h2>
    </div>
 </template>
 
-<script>
-export default {
-   props: {
-      info: Object
-   },
-   setup(props, {emit}) {
-      function Close() {
-         emit("close");
-      }
+<script setup>
+import { defineEmits, defineProps, onMounted, ref } from "vue"
 
-      return {
-         Close
-      }
-   }
-}
+const remaining_time = ref(30);
+
+defineProps([
+   "info"
+])
+
+const emit = defineEmits([
+   "close"
+])
+
+onMounted(() => {
+   setInterval(() => {
+      remaining_time.value -= 1;
+
+      if (remaining_time.value <= 0) emit("close")
+   }, 1000)
+})
 </script>
 
 <style scoped>
@@ -40,81 +42,43 @@ export default {
 .match-info {
    display: flex;
    flex-direction: column;
-
-   position: fixed;
-   top: 50%;
-   left: 50%;
-   transform: translate(-50%, -50%);
-
-   width: 275px;
-   height: 100px;
-
-   color: var(--foreground-1);
-}
-
-.background {
-   background-color: var(--background-1);
-   opacity: 0.5;
-   z-index: 1;
-
-   position: fixed;
-
-   top: 0px;
-   left: 0;
-   width: 100vw;
-   height: 100vh;
-}
-
-.match-type {
-}
-
-.info {
-   z-index: 2;
-
-   display: flex;
-   flex-direction: column;
    justify-content: center;
    align-items: center;
 
-   background-color: var(--background-2);
-   border-radius: 10px 10px 0 0;
+   position: fixed;
+   top: 0;
+   left: 0;
 
-   height: 100%;
+   width: 100vw;
+   height: 100vh;
+
+   color: var(--foreground-1);
+   background-color: var(--background-1);
 }
 
 .versus {
    display: flex;
    flex-direction: row;
-   width: 100%;
-   padding-top: 10px;
+   gap: 10px;
+   width: fit-content;
+   margin: auto;
 }
 
-.versus div {
-   flex-grow: 1;
-   flex: 1;
-   text-align: center;
+h3 {
+   font-size: 32px;
 }
 
-.versus div:first-child {
-   text-align: right;
-   flex: 2;
+h3,
+.versus .vs {
+   color: var(--background-3);
+   font-size: 48px;
 }
 
-.versus div:last-child {
-   text-align: left;
-   flex: 2;
+.versus > h1 {
+   margin: 0;
 }
 
-button {
-   z-index: 2;
-   border-radius: 0 0 10px 10px;
-
-   border: none;
-   background-color: var(--background-3);
-   color: var(--foreground-1);
-
-   cursor: pointer;
-
-   height: 32px;
+.timer {
+   margin-top: 60px;
 }
 </style>
