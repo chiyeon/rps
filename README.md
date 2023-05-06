@@ -1,6 +1,6 @@
 ![](previews/rps_1.png)
 
-[**RPS Tourney**](https://tteok-rps.herokuapp.com/) is a minimal Rock Paper Scissors tournament web game, with a ReactJS client and an Express, Socket.js powered Node serverside, deployed on Heroku.
+[**RPS Tourney**](https://tteok-rps.herokuapp.com/) is a minimal Rock Paper Scissors tournament web game, with a Vue client and an Express, Socket.js powered Node serverside, deployed on Render.
 
 ### Overview
 
