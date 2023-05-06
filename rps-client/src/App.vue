@@ -45,9 +45,9 @@ import io from "socket.io-client";
 import { ref } from "vue";
 
 import ErrorMessage from "./components/ErrorMessage.vue"
-import Lobby from "./components/Lobby.vue"
-import Login from "./components/Login.vue"
-import Game from "./components/Game.vue"
+import Lobby from "./components/LobbyView.vue"
+import Login from "./components/LoginView.vue"
+import Game from "./components/GameView.vue"
 
 export default {
    components: {
