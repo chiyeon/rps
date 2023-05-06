@@ -1,6 +1,6 @@
 <template>
    <div>
-      <div v-if="!gameOver && showGame" class="game">
+      <div v-if="!gameOver" class="game">
          <div class="game-info">
             <div class="game-info-matches">
                <div>Matches this Set:</div>

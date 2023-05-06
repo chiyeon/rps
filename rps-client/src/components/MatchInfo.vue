@@ -13,7 +13,7 @@
 <script setup>
 import { defineEmits, defineProps, onMounted, ref } from "vue"
 
-const remaining_time = ref(30);
+const remaining_time = ref(3);
 
 defineProps([
    "info"
@@ -55,22 +55,21 @@ onMounted(() => {
    color: var(--foreground-1);
    background-color: var(--background-1);
 }
-
 .versus {
    display: flex;
    flex-direction: row;
    gap: 10px;
    width: fit-content;
-   margin: auto;
 }
 
 h3 {
-   font-size: 32px;
+   font-size: 18px !important;
+   margin: 0;
 }
 
 h3,
 .versus .vs {
-   color: var(--background-3);
+   color: var(--background-2);
    font-size: 48px;
 }
 
@@ -79,6 +78,6 @@ h3,
 }
 
 .timer {
-   margin-top: 60px;
+   margin-top: 100px;
 }
 </style>
