@@ -59,8 +59,8 @@ export default {
    setup() {
       const VERSION = ref("a1.3");
 
-      const DEBUG = ref(false);
-      const ENDPOINT = DEBUG.value ? "http://localhost:3000" : "https://rps-tourney.onrender.com"
+      const DEBUG = ref(true);
+      const ENDPOINT = DEBUG.value ? "http://localhost:25565" : "https://rps-tourney.onrender.com"
 
       var errorMessage = ref("");      // text error message, displays when not blank
       var userChoice = ref("");        // rock, paper, or scissor (whichever user chosen)
