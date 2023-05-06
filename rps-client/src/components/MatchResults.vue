@@ -1,34 +1,18 @@
 <template>
-   <div class="match-results">
-      <div class="background"></div>
+   <div class="match-results" @click="Close()">
       <div class="match-info">
          <div class="player1">
             <div class="winner">
-               <img v-if="info.winner == 0" src="../assets/imgs/crown.png" />
+               <img alt="Crown" src="../assets/imgs/crown.png" />
             </div>
             <div class="choice">
-               <img :src="GetImage(info.choices[0])" />
-            </div>
-            <div>
-               {{info.players[0].name}}
+               <img :src="GetImage(info.choices[info.winner])" />
             </div>
          </div>
          <div class="info">
-            <pre>{{info.targetWins}}</pre>
-         </div>
-         <div class="player2">
-            <div class="winner">
-               <img v-if="info.winner == 1" src="../assets/imgs/crown.png" />
-            </div>
-            <div class="choice">
-               <img :src="GetImage(info.choices[1])" />
-            </div>
-            <div>
-               {{info.players[1].name}}
-            </div>
+            <p>{{info.targetWins}}</p>
          </div>
       </div>
-      <button @click="Close()">OKAY</button>
    </div>
 </template>
 
@@ -61,71 +45,47 @@ export default {
    }
 }
 
+h1 {
+   font-size: 36px !important;
+}
+
 .match-results {
    z-index: 1;
 
    display: flex;
    flex-direction: column;
-
-   width: 400px;
-   height: 200px;
-
-   position: absolute;
-   top: 50%;
-   left: 50%;
-   transform: translate(-50%, -50%);
-}
-
-.background {
-   z-index: 3;
+   justify-content: center;
+   align-items: center;
 
    position: absolute;
    width: 100vw;
    height: 100vh;
-
-   transform: translate(-50%, -50%);
-   left: 50%;
-   top: 50%;
+   top: 0;
+   left: 0;
 
    background-color: var(--background-1);
-   opacity: 0.5;
 }
 
 .match-info {
+   height: fit-content;
+
    z-index: 4;
 
    display: flex;
-   flex-direction: row;
+   flex-direction: column;
    justify-content: center;
    align-items: center;
-
-   background-color: var(--background-2);
-   border-radius: 10px 10px 0 0;
-
-   flex: 3;
-   
-   width: 100%;
-
    text-align: center;
 
-   color: var(--foreground-1);
+   gap: 20px;
 }
 
 .player1, .player2 {
    height: 100%;
 }
 
-button {
-   z-index: 4;
-
-   border-radius: 0 0 10px 10px;
-   border: none;
-   background-color: var(--background-3);
-   color: var(--foreground-1);
-
-   height: 32px;
-
-   cursor: pointer;
+img {
+   image-rendering: pixelated;
 }
 
 .choice img {
@@ -138,9 +98,8 @@ button {
 
 .winner img {
    width: 50px;
-}
-
-.match-results div {
-   flex: 1;
+   position: relative;
+   right: 10px;
+   bottom: 10px;
 }
 </style>

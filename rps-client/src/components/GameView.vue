@@ -1,28 +1,31 @@
 <template>
    <div>
       <div v-if="!gameOver" class="game">
-         <div class="game-info">
-            <div class="game-info-matches">
-               <div>Matches this Set:</div>
-               <div v-for="i in lobby.matches" :key="i.players[0].id">
-                  {{i.players[0].name + (i.players[0].id == userSocket.id ? " (you)" : "")}} vs {{i.players[1].name + (i.players[1].id == userSocket.id ? " (you)" : "")}}
-                  {{(i == lobby.matches[lobby.currentMatch]) ? "(current)" : ""}}
-               </div>
-            </div>
-            <div class="game-info-log">
-               <div>Game Transcript:</div>
-               <div class="game-info-log-scroll">
-                  <div v-for="message in [...lobby.messages].reverse()" :key="message.id">
-                     {{message.content}}
-                  </div>
-               </div>
-            </div>
+         <div class="versus">
+            <h1>{{lobby.matches[lobby.currentMatch].players[0].name}}</h1>
+            <h1 class="vs">vs</h1>
+            <h1>{{lobby.matches[lobby.currentMatch].players[1].name}}</h1>
          </div>
-         
          <div class="game-options" v-if="lobby.matches.length > 0 && userSocket.id == lobby.matches[lobby.currentMatch].players[0].id || userSocket.id == lobby.matches[lobby.currentMatch].players[1].id">
             <button :class="userChoice == 'rock' ? 'game-option selected' : 'game-option'" @click="Select('rock')"><img src="../assets/imgs/rock.png" /></button>
             <button :class="userChoice == 'paper' ? 'game-option selected' : 'game-option'" @click="Select('paper')"><img src="../assets/imgs/paper.png" /></button>
             <button :class="userChoice == 'scissor' ? 'game-option selected' : 'game-option'" @click="Select('scissor')"><img src="../assets/imgs/scissor.png" /></button>
+         </div>
+         <div v-else class="game-info">
+            <div class="game-info-matches">
+               <h2>Up Next</h2>
+               <p v-for="i in lobby.matches" :key="i.players[0].id" v-if="i != lobby.matches[lobby.currentMatch]">
+                  {{ i.players[0].name + (i.players[0].id == userSocket.id ? " (you)" : "")}} vs {{i.players[1].name + (i.players[1].id == userSocket.id ? " (you)" : "") }}
+               </p>
+            </div>
+            <div class="game-info-log">
+               <h2>Game Transcript:</h2>
+               <div class="game-info-log-scroll" ref="matchTranscript">
+                  <p v-for="message in lobby.messages" :key="message.id">
+                     {{message.content}}
+                  </p>
+               </div>
+            </div>
          </div>
       </div>
       <MatchInfo 
@@ -84,6 +87,7 @@ export default {
       const showMatchResults = ref(false);
       const showMatchInfo = ref(false);
       const showGame = ref(false)
+      const matchTranscript = ref(null)
 
       watch(() => props.matchInfo, () => {
          showMatchInfo.value = true;
@@ -92,6 +96,10 @@ export default {
       watch(() => props.matchResults, () => {
          showMatchResults.value = true;
          showMatchInfo.value = false;
+      })
+
+      watch(() => props.lobby.messages, () => {
+         matchTranscript.value.scrollTop = matchTranscript.value.scrollHeight
       })
 
       function Select(_choice) {
@@ -122,24 +130,11 @@ export default {
 <style scoped>
 @media only screen and (max-width: 600px) {
    .game-info {
-      grid-template-columns: 1fr !important;
+      grid-template-rows: 150px 450px !important;
    }
-
-   .game {
-      width: 80vw !important;
-      height: 500px !important;
-   }
-
-   .game-options {
-      width: 80vw !important;
-   }
-
-   .game-option {
-      padding: 0%;
-   }
-
-   .game-option img {
-      width: 100% !important;
+   
+   .versus {
+      margin-top: 20px !important;
    }
 }
 
@@ -147,25 +142,27 @@ export default {
    display: flex;
    flex-direction: column;
    gap: 10px;
-   
-   width: 500px;
-   height: 400px;
 
    color: var(--foreground-1);
 }
 
 .game-info {
    display: grid;
-   grid-template-columns: 1fr 1fr;
+   grid-template-rows: 200px 500px;
    min-height: 0;
+   max-width: 500px;
+   margin: auto;
 
-   flex: 2;
+   border-radius: 4px;
 
-   border-radius: 10px;
+   border: 3px solid var(--background-3);
+
    padding: 10px;
 
-   background-color: var(--background-2);
+}
 
+.game-info-log-scroll p {
+   margin: 0;
 }
 
 .game-info-matches {
@@ -179,33 +176,39 @@ export default {
 }
 
 .game-options {
-   width: 500px;
+   max-width: calc(130px * 3);
+   height: fit-content;
 
-   flex: 1;
-   
-   display: grid;
-   grid-template-columns: 1fr 1fr 1fr;
+   margin: auto;
+   margin-top: 60px;
 
-   border-radius: 10px;
+   display: flex;
+   flex-wrap: wrap;
+   justify-content: center;
+   align-items: center;
 
-   background-color: var(--background-2);
+   background-color: var(--background-1);
+
+   image-rendering: pixelated;
 }
 
 .game-option {
    background: none;
    border: none;
-
-   padding: 15%;
+   padding: 10px;
 
    cursor: pointer;
 
    opacity: 0.3;
 
    transition: opacity 100ms;
+
+   width: 120px;
+   height: 120px;
 }
 
 .game-option img {
-   width: 90%;
+   width: 100%;
 }
 
 .game-option:hover {
@@ -242,5 +245,26 @@ export default {
 .results-bottom pre {
    max-width: 100%;
    white-space: pre-wrap;
+}
+
+.versus {
+   justify-content: center;
+   display: flex;
+   flex-direction: row;
+   gap: 10px;
+   flex-wrap: wrap;
+   width: fit-content;
+   margin: auto;
+   margin-top: 100px;
+}
+
+.versus .vs {
+   color: var(--background-2);
+   font-size: 48px;
+}
+
+.versus > h1 {
+   margin: 0;
+   font-size: 36px !important;
 }
 </style>

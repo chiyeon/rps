@@ -55,16 +55,20 @@ onMounted(() => {
    color: var(--foreground-1);
    background-color: var(--background-1);
 }
-.versus {
-   display: flex;
-   flex-direction: row;
-   gap: 10px;
-   width: fit-content;
-}
+
 
 h3 {
    font-size: 18px !important;
    margin: 0;
+}
+
+.versus {
+   display: flex;
+   flex-direction: row;
+   gap: 10px;
+   flex-wrap: wrap;
+   justify-content: center;
+   width: fit-content;
 }
 
 h3,
@@ -75,6 +79,7 @@ h3,
 
 .versus > h1 {
    margin: 0;
+   font-size: 36px !important;
 }
 
 .timer {
