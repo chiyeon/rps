@@ -2,8 +2,8 @@
    <div class="tourney-results">
       <div class="platform">
          <div class="winners">
-            <div class="winner"><img class="crown" src="../assets/imgs/crown.png" /><div>{{lobby.winners.first.name}}</div></div>
-            <div class="honored">{{lobby.winners.second.name}}</div>
+            <div class="winner"><img class="crown" src="../assets/imgs/crown.png" /><p>{{lobby.winners.first.name}}</p></div>
+            <p class="honored">{{lobby.winners.second.name}}</p>
          </div>
          <img class="platform-img" src="../assets/imgs/platform.png" />
       </div>
@@ -12,12 +12,11 @@
 
 <script>
 export default {
-   props: {
-      lobby: Object
-   },
-   setup() {
-      
-   },
+    props: {
+        lobby: Object
+    },
+    setup() {
+    },
 }
 </script>
 
@@ -45,19 +44,12 @@ export default {
 
 .winners {
    color: var(--foreground-1);
-   position: absolute;
-   text-align: center;
-
    display: grid;
-   grid-template-columns: 1fr 1fr;
-
-   width: 300px;
+   position: absolute;
 }
 
 .crown {
    width: 54px;
-   position: absolute;
-   transform: translate(-45%, -95%);
 }
 
 img {
@@ -65,10 +57,24 @@ img {
 }
 
 .winner {
-   transform: translateY(-65px);
+   
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: center;
+   
+   position: absolute;
+   transform: translate(-99px, -145px);
+}
+
+.winner > p {
+   margin: 0;
+   width: 150px;
+   word-wrap: break-word;
 }
 
 .honored {
-   transform: translateY(40px);
+   position: absolute;
+   transform: translate(73px, -25px);
 }
 </style>

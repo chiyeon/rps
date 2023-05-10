@@ -1,8 +1,12 @@
 <template>
    <div class="match-results" @click="Close()">
+      <div class="background"></div>
       <div class="match-info">
+         <div class="exit-button">
+
+         </div>
          <div class="player1">
-            <div class="winner">
+            <div class="winner" v-if="info.winner != undefined">
                <img alt="Crown" src="../assets/imgs/crown.png" />
             </div>
             <div class="choice">
@@ -27,7 +31,9 @@ export default {
       }
 
       function GetImage(choice) {
-         return require(`../assets/imgs/${choice}.png`);
+         if (choice)
+            return require(`../assets/imgs/${choice}.png`);
+         return require("../assets/imgs/tie.png")
       }
 
       return {
@@ -52,36 +58,53 @@ h1 {
 .match-results {
    z-index: 1;
 
-   display: flex;
-   flex-direction: column;
-   justify-content: center;
-   align-items: center;
-
-   position: absolute;
    width: 100vw;
    height: 100vh;
+}
+
+.background {
+   position: fixed;
+   width: 100%;
+   height: 100%;
    top: 0;
    left: 0;
 
-   background-color: var(--background-1);
+   opacity: 0.5;
+   background-color: black;
 }
 
 .match-info {
+   position: absolute;
+   width: 400px;
+   height: 300px;
+   top: 50%;
+   left: 50%;
+   transform: translate(-50%, -50%);
+
+   background-color: var(--background-1);
+   border: 3px solid var(--background-3);
+   border-radius: 4px;
+
    height: fit-content;
+   max-width: 350px;
+
+   padding-top: 15px;
 
    z-index: 4;
+
+   gap: 10px;
 
    display: flex;
    flex-direction: column;
    justify-content: center;
    align-items: center;
    text-align: center;
-
-   gap: 20px;
 }
 
 .player1, .player2 {
    height: 100%;
+   position: relative;
+   top: 20px;
 }
 
 img {
@@ -90,6 +113,7 @@ img {
 
 .choice img {
    width: 100px;
+   position: relative;
 }
 
 .winner {
@@ -97,9 +121,8 @@ img {
 }
 
 .winner img {
-   width: 50px;
+   width: 71px;
    position: relative;
-   right: 10px;
-   bottom: 10px;
+   bottom: 36px;
 }
 </style>
