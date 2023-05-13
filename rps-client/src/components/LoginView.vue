@@ -53,7 +53,7 @@ export default {
 
 <style scoped>
 .login {
-   max-width: 200px;
+   max-width: 225px;
    margin: auto;
 }
 
@@ -63,7 +63,7 @@ export default {
 
 .login input {
 
-   padding: 3px 10px 3px 10px;
+   padding: 6px 12px;
    height: 30px;
    width: calc(100% - 26px);
 
@@ -72,6 +72,8 @@ export default {
 
    border: 3px solid var(--background-3);
    border-radius: 4px;
+
+   font-size: 16px;
 
 }
 
@@ -94,11 +96,11 @@ input:focus + p {
    color: var(--background-3);
    background-color: var(--background-1);
    position: absolute;
-   left: 20px;
-   bottom: 21px;
+   left: 22px;
+   bottom: 24px;
    width: fit-content;
    padding: 0 4px;
-   font-size: 12px;
+   font-size: 14px;
 }
 
 /* .login input:last-child {
