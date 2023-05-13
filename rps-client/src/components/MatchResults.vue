@@ -6,7 +6,7 @@
 
          </div>
          <div class="player1">
-            <div class="winner" v-if="info.winner != undefined">
+            <div class="winner" v-if="info.choices[info.winner]">
                <img alt="Crown" src="../assets/imgs/crown.png" />
             </div>
             <div class="choice">
@@ -60,6 +60,9 @@ h1 {
 
    width: 100vw;
    height: 100vh;
+   position: fixed;
+   left: 0;
+   top: 0;
 }
 
 .background {

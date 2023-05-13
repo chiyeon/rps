@@ -1,0 +1,74 @@
+=== NEW SERVER REWRITE IDEAS ===
+
+use firebase for DB
+
+DB will be: 
+    lobbies collection
+        lobbies document name is key/name of the lobby
+        lobby data is:
+            key/name of lobby
+            host ID of player
+            players: list [
+                list of IDs 
+            ]
+            boolean state: has_started
+            competing_players: list [
+                of the 2 player ids
+            ]
+
+    players collection
+        document by socket ID
+            player name
+            player sprite
+            connected lobby id
+
+active game session:
+active lobbies with the game started will have server-side data stored
+    the lobbie 
+
+EVENTS
+    on start of game
+        2 competing players names are sent
+        competing_players list is updated
+        shows game view on clients
+    choose option
+        check if player ID is in competing_players list, if so OKAY
+        select option in game server
+        send option_chosen event for player by name
+    option chosen event
+        submitted after a player chooses item, just has their name
+        makes all the clients display it visually, option chosen NOT shown
+    option hovered event
+        submitted after a player hovers an item, just has their name
+        visual for client
+    game end 
+        after both players chosen, their options + names will be sent in a packet
+            {
+                "name": "option",
+                "name2": "option"
+            }
+        clients will show options flipping, then the winner is shown. new game signal sent after like 3 seconds or whatever
+    on tourney end
+        on the end of the tournament entirely, winners in scoreboard will be shown
+        #1 and #2 honored
+
+Vues and components
+Root
+    interfaces directly with the server
+    global properties
+        socket ID
+    
+
+
+EntryVue
+    Login Component
+    Lobby Component
+GameVue
+    Match Component
+        Match Start Announcement Component
+        Player Component
+        Match Results Announcement Component
+Results Vue
+    Scoreboard component
+    play again check
+    

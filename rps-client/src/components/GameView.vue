@@ -91,6 +91,7 @@ watch(() => props.matchInfo, () => {
 watch(() => props.matchResults, () => {
    showMatchResults.value = true;
    showMatchInfo.value = false;
+   Select(null)
 })
 
 watch(() => props.lobby.messages, async () => {
