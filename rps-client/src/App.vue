@@ -56,13 +56,9 @@ import Game from "./components/GameView.vue"
 const VERSION = ref("2.0");
 
 const DEBUG = ref(true);
-<<<<<<< HEAD
 const ENDPOINT = DEBUG.value ? "http://localhost:25565" : "https://rps-tourney.onrender.com"
-=======
-const ENDPOINT = DEBUG.value ? "https://chiyeon-fluffy-spoon-9j67xwg95xg3x6w4-25565.preview.app.github.dev/" : "https://rps-tourney.onrender.com"
 
 const SPRITES = "EFLNQWYZaksuvwxy".split("")
->>>>>>> ee0ed4b3c85ce83423c050cbd3d7ec74c471ce3c
 
 var errorMessage = ref("");      // text error message, displays when not blank
 var userChoice = ref("");        // rock, paper, or scissor (whichever user chosen)

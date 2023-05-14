@@ -60,10 +60,6 @@ h1 {
 
    width: 100vw;
    height: 100vh;
-<<<<<<< HEAD
-
-=======
->>>>>>> ee0ed4b3c85ce83423c050cbd3d7ec74c471ce3c
    position: fixed;
    left: 0;
    top: 0;
