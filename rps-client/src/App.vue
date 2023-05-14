@@ -1,5 +1,5 @@
 <template>
-   <LoadingView v-if="loading" />
+   <LoadingView v-if="loading" :sprites="SPRITES" />
    <div class="lobby-setting" v-if="!lobbyStarted">
       <Login 
          class="center"
@@ -56,7 +56,13 @@ import Game from "./components/GameView.vue"
 const VERSION = ref("2.0");
 
 const DEBUG = ref(true);
+<<<<<<< HEAD
 const ENDPOINT = DEBUG.value ? "http://localhost:25565" : "https://rps-tourney.onrender.com"
+=======
+const ENDPOINT = DEBUG.value ? "https://chiyeon-fluffy-spoon-9j67xwg95xg3x6w4-25565.preview.app.github.dev/" : "https://rps-tourney.onrender.com"
+
+const SPRITES = "EFLNQWYZaksuvwxy".split("")
+>>>>>>> ee0ed4b3c85ce83423c050cbd3d7ec74c471ce3c
 
 var errorMessage = ref("");      // text error message, displays when not blank
 var userChoice = ref("");        // rock, paper, or scissor (whichever user chosen)
@@ -64,11 +70,11 @@ var userChoice = ref("");        // rock, paper, or scissor (whichever user chos
 var inLobby = ref(false);        // are we in lobby or not
 var lobbyStarted = ref(false);   // has lobby started the game yet
 var gameOver = ref(false);       // show end screen or not
-var matchInfo = ref(null);    // collection of match information
+var matchInfo = ref(null);       // collection of match information
 var matchResults = ref(null);    // match results, whether end of round or match
 var tourneyResults = ref(null);  // results at the very end of the tournament
-var loading = ref(false)      // are we loading scren
-var openChangelog = ref(false) // are we in changelog
+var loading = ref(false)         // are we loading scren
+var openChangelog = ref(false)   // are we in changelog
 
 var userSocket = ref(null);      // ref to user socket client object
 var lobby = ref(null);           // ref to lobby object
@@ -158,7 +164,7 @@ function ResetError() {
 
 function Select(_choice) {
    userChoice.value = _choice;
-   userSocket.value.emit("choose", {lobbyName: lobby.value.name, choice: _choice});
+   if (userChoice.value) userSocket.value.emit("choose", {lobbyName: lobby.value.name, choice: _choice});
 }
 
 </script>

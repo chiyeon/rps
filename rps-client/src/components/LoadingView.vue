@@ -7,13 +7,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue"
+import { ref, onMounted, defineProps } from "vue"
+
+const props = defineProps([
+    "sprites"
+])
 
 const icon_text = ref("")
-const values = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\"#".split("")
 
 const new_icon = () => {
-    icon_text.value = values[Math.floor(Math.random() * (values.length - 1))]
+    icon_text.value = props.sprites[Math.floor(Math.random() * (props.sprites.length - 1))]
 }
 
 onMounted(() => {
