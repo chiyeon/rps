@@ -55,7 +55,7 @@ import Game from "./components/GameView.vue"
 
 const VERSION = ref("2.0");
 
-const DEBUG = ref(false);
+const DEBUG = ref(true);
 const ENDPOINT = DEBUG.value ? "http://localhost:25565" : "https://rps-tourney.onrender.com"
 
 var errorMessage = ref("");      // text error message, displays when not blank
