@@ -38,9 +38,8 @@ const start = () => {
         methods: ["GET", "POST"]
     }))
 
-    firebase.set_doc_path("test/testing", {
-        test: "yes"
-    })
+    firebase.delete_collection("lobbies");
+    firebase.delete_collection("players");
 
     // set up socket definitions
     define_socket()
@@ -59,8 +58,9 @@ const start = () => {
 
 const define_socket = () => {
 
-    const create_player = (name, sprite, lobby) => {
+    const create_player = (id, name, sprite, lobby) => {
         return {
+            id,
             name,
             sprite,
             lobby
@@ -74,15 +74,18 @@ const define_socket = () => {
         } else {
             if (doc.players.find(a => a.name == player_data.name)) {
                 // same name already in the lobby!
-                return "DUPLICATE_NAME"
+                return io.to(player_data.id).emit("error", "Name is taken.");
             }
 
             doc.player_count += 1;
             doc.players.push(player_data);
-            firebase.set_doc("lobbies", lobby_name, doc);
-        }
 
-        return "SUCCESS"
+            doc.players.forEach(p => {
+                io.to(p.id).emit("lobby-update", doc);
+            })
+
+            await firebase.set_doc("lobbies", lobby_name, doc);
+        }
     }
 
     const create_lobby = async (lobby_name) => {
@@ -90,24 +93,26 @@ const define_socket = () => {
             name: lobby_name,
             player_count: 0,
             players: [],
-            host_player: "",
+            host_player: {},
             game_state: "lobby"
         })
     }
 
     const create_and_join_lobby = async (lobby_name, player_data) => {
-        await firebase.set_doc("lobbies", lobby_name, {
+        let new_lobby = {
             name: lobby_name,
             player_count: 1,
             players: [
                 player_data
             ],
-            host_player: player_data.name,
+            host_player: player_data,
             game_state: "lobby"
-        })
+        }
+        await firebase.set_doc("lobbies", lobby_name, new_lobby)
+        io.to(player_data.id).emit("lobby-update", new_lobby);
     }
 
-    const leave_lobby = async (player_data, player_id) => {
+    const leave_lobby = async (player_data) => {
         // get lobby first
         let lobby_name = player_data.lobby;
         let lobby = await firebase.get_doc("lobbies", lobby_name);
@@ -123,15 +128,20 @@ const define_socket = () => {
             lobby.players = lobby.players.filter(p => p.name != player_data.name)
             
             // migrate if host is leaving
-            if (lobby.host_player == player_data.name) {
-                lobby.host_player = lobby.players[0].name;
+            if (lobby.host_player.id == player_data.id) {
+                lobby.host_player = lobby.players[0];
             }
+
+            // update the entire lobby
+            lobby.players.forEach(p => {
+                io.to(p.id).emit("lobby-update", lobby);
+            })
 
             await firebase.set_doc("lobbies", lobby_name, lobby);
         }
 
         player_data.lobby = "";
-        await firebase.set_doc("players", player_id, player_data);
+        await firebase.set_doc("players", player_data.id, player_data);
     }
 
     io.on("connection", (socket) => {
@@ -149,16 +159,11 @@ const define_socket = () => {
 
             // todo profanity check ?
 
-            let player_data = create_player(login_packet.name, login_packet.sprite, login_packet.lobby);
+            let player_data = create_player(socket.id, login_packet.name, login_packet.sprite, login_packet.lobby);
 
-            let code = await join_lobby(login_packet.lobby, player_data);
-
-            if (code == "DUPLICATE_NAME") {
-                return socket.emit("error", "Name is taken!");
-            } else if (code == "SUCCESS") {
-                // save player in db
-                await firebase.set_doc("players", socket.id, player_data);
-            }
+            await join_lobby(login_packet.lobby, player_data);
+            // save player in db
+            await firebase.set_doc("players", socket.id, player_data);
         })
     })
 }

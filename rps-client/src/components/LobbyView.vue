@@ -3,13 +3,13 @@
       <h1 class="lobby-title"><span>lobby:</span><br />{{lobby.name}}</h1>
       <div class="lobby-players">
          <div :class="selfID == player.id ? 'player highlight' : 'player'" v-for="player in lobby.players" :key="player.id">
-            <img :class="lobby.host.id == player.id ? 'host-icon' : 'host-icon hidden'" alt="Host" src="../assets/imgs/crown.png" />
+            <img :class="lobby.host_player.name == player.name ? 'host-icon' : 'host-icon hidden'" alt="Host" src="../assets/imgs/crown.png" />
             <p class="name">{{ player.name }} {{selfID == player.id ? "(you)" : ""}}</p>
          </div>
       </div>
       <div class="buttons">
          <button class="alternative" @click="() => emit('exit')">quit</button>
-         <button :disabled="selfID != lobby.host.id" class="lobby-start" @click="() => emit('begin')">begin</button>
+         <button :disabled="selfID != lobby.host_player.id" class="lobby-start" @click="() => emit('begin')">begin</button>
       </div>
    </div>
 </template>
