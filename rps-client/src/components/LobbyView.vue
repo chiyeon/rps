@@ -5,6 +5,7 @@
          <div :class="selfID == player.id ? 'player highlight' : 'player'" v-for="player in lobby.players" :key="player.id">
             <img :class="lobby.host_player.name == player.name ? 'host-icon' : 'host-icon hidden'" alt="Host" src="../assets/imgs/crown.png" />
             <p class="name">{{ player.name }} {{selfID == player.id ? "(you)" : ""}}</p>
+            <p class="sprite" @click="() => selfID == player.id ? emit('new-sprite') : ''">{{ player.sprite }}</p>
          </div>
       </div>
       <div class="buttons">
@@ -18,12 +19,13 @@
 import { defineProps, defineEmits } from "vue"
 
 defineProps([
-   "lobby", "isHost", "selfID"
+   "lobby", "isHost", "selfID", "sprites"
 ])
 
 const emit = defineEmits([
    "begin",
-   "exit"
+   "exit",
+   "new-sprite"
 ])
 </script>
 
@@ -92,6 +94,14 @@ button:disabled {
 
 .player .host-icon.hidden {
    opacity: 0;
+}
+
+.sprite {
+   font-family: "Icons";
+   font-size: 32px;
+   margin-left: auto;
+   cursor: pointer;
+   user-select: none;
 }
 </style>
 

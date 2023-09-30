@@ -20,6 +20,8 @@ const firebase = require("./firebase.js")
 const PORT = process.env.PORT || 3000
 const VERSION = "0.1"
 
+const sprites = "EFLNQWYZaksuvwxy".split("")
+
 /*
  * functions
  */
@@ -58,11 +60,11 @@ const start = () => {
 
 const define_socket = () => {
 
-    const create_player = (id, name, sprite, lobby) => {
+    const create_player = (id, name, lobby) => {
         return {
             id,
             name,
-            sprite,
+            sprite: sprites[Math.floor(Math.random() * sprites.length)],
             lobby
         }
     }
@@ -159,11 +161,31 @@ const define_socket = () => {
 
             // todo profanity check ?
 
-            let player_data = create_player(socket.id, login_packet.name, login_packet.sprite, login_packet.lobby);
+            let player_data = create_player(socket.id, login_packet.name, login_packet.lobby);
 
             await join_lobby(login_packet.lobby, player_data);
             // save player in db
             await firebase.set_doc("players", socket.id, player_data);
+        })
+
+        socket.on("new-sprite", async () => {
+            let player = await firebase.get_doc("players", socket.id);
+            let lobby = await firebase.get_doc("lobbies", player.lobby);
+
+            // get random sprite
+            let new_sprite = sprites[Math.floor(Math.random() * sprites.length)];
+
+            player.sprite = new_sprite;
+
+            // sob skull coffin
+            let p_index = lobby.players.indexOf(lobby.players.find(p => p.id == player.id));
+            lobby.players[p_index].sprite = new_sprite;
+
+            lobby.players.forEach(p => {
+                io.to(p.id).emit("lobby-update", lobby)
+            })
+
+            await firebase.set_doc("lobbies", player.lobby, lobby);
         })
     })
 }

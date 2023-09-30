@@ -15,8 +15,10 @@
          v-if="inLobby"
          @begin="Begin"
          @exit="QuitLobby"
+         @new-sprite="NewSprite"
          :lobby="lobby"
          :selfID="userSocket.id"
+         :sprites="SPRITES"
       />
       <div class="version-info"
       >
@@ -102,7 +104,6 @@ function Connect(_name, _lobby) {
 
       userSocket.value.emit("login", {
          name: _name,
-         sprite: 0,
          id: userSocket.value.id,
          lobby: _lobby
       });
@@ -147,6 +148,10 @@ function Connect(_name, _lobby) {
 
 function Begin() {
    userSocket.value.emit("start-game", lobby.value.name);
+}
+
+function NewSprite() {
+   userSocket.value.emit("new-sprite");
 }
 
 function QuitLobby() {
