@@ -56,7 +56,7 @@ import Game from "./components/GameView.vue"
 const VERSION = ref("2.0");
 
 const DEBUG = ref(true);
-const ENDPOINT = DEBUG.value ? "http://localhost:25565" : "https://rps-tourney.onrender.com"
+const ENDPOINT = DEBUG.value ? "http://localhost:3000/" : "https://rps-tourney.onrender.com"
 
 const SPRITES = "EFLNQWYZaksuvwxy".split("")
 
@@ -86,7 +86,7 @@ function Connect(_name, _lobby) {
    // show loading screen
    loading.value = true
 
-   userSocket.value = io(ENDPOINT);
+   userSocket.value = io.connect(ENDPOINT);
 
    // update local copy of lobby
    userSocket.value.on("lobby-update", _lobby => {
@@ -102,6 +102,7 @@ function Connect(_name, _lobby) {
 
       userSocket.value.emit("login", {
          name: _name,
+         sprite: 0,
          id: userSocket.value.id,
          lobby: _lobby
       });
