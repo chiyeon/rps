@@ -23,6 +23,13 @@ const VERSION = "0.1"
 const sprites = "EFLNQWYZaksuvwxy".split("")
 
 /*
+ * Game stuff
+ */
+const ROCK      = 0b001
+const PAPER     = 0b010
+const SCISSORS  = 0b100;
+
+/*
  * functions
  */
 
@@ -60,6 +67,16 @@ const start = () => {
 
 const define_socket = () => {
 
+    const create_match = (players, target_wins = 2) => {
+        return {
+            players,
+            choices: [0, 0],
+            wins: [0, 0],
+            target_wins,
+            tier: 0
+        }
+    }
+
     const create_player = (id, name, lobby) => {
         return {
             id,
@@ -77,6 +94,11 @@ const define_socket = () => {
             if (doc.players.find(a => a.name == player_data.name)) {
                 // same name already in the lobby!
                 return io.to(player_data.id).emit("error", "Name is taken.");
+            }
+
+            // ensure lobby is waiting for players
+            if (doc.game_state != "lobby") {
+                return io.to(player_data.id).emit("error", "Lobby has already started.");
             }
 
             doc.player_count += 1;
@@ -186,6 +208,61 @@ const define_socket = () => {
             })
 
             await firebase.set_doc("lobbies", player.lobby, lobby);
+        })
+
+        socket.on("start-game", async (lobby_name) => {
+            let lobby = await firebase.get_doc("lobbies", lobby_name);
+
+            // only allow host to start game
+            if (socket.id != lobby.host_player.id) {
+                return socket.emit("error", "Invalid user!");
+            }
+
+            if (lobby.player_count < 2) {
+                return socket.emit("error", "At least 2 players required.");
+            }
+
+            lobby.game_state = "tournament"
+            lobby.matches = []
+            lobby.current_match = 0;
+            lobby.current_winners = [];
+            lobby.messages = []
+
+            // set up matches
+
+            // randomly shuffle list of all players
+            let player_pool = [...Array(lobby.players.length).keys()]
+            for (let i = 0; i < player_pool.length; i++) {
+                let target = Math.floor(Math.random() * (player_pool))
+
+                let temp = player_pool[target];
+                player_pool[target] = player_pool[i];
+                player_pool[i] = temp;
+            }
+
+            // a random player advances if odd number of players
+            if (player_pool.length % 2 == 1) {
+                lobby.current_winners.push(player_pool.pop());
+            }
+
+            // set up matches randomly
+            for(let i = 0; i < player_pool.length; i+= 2) {
+                lobby.matches.push(create_match([player_pool[i], player_pool[i+1]]))
+            }
+
+            // udate all players
+            for (let i = 0; i < lobby.players.length; i++) {
+                let p = lobby.players[i];
+
+                if (lobby.current_winners.includes[i]) {
+                    io.to(p.id).emit("error", "Due to uneven matches, you will be sitting out this round.");
+                }
+
+                io.to(p.id).emit("start-game", lobby);  // update lobby
+                // start match
+            }
+
+            firebase.set_doc("lobbies", lobby_name, lobby);
         })
     })
 }
