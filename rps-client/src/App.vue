@@ -129,10 +129,10 @@ function Connect(_name, _lobby) {
       lobby.value.messages = messages;
    });
 
-   userSocket.value.on("match-start", ({players, targetWins}) => {
+   userSocket.value.on("match-start", ({players, target_wins}) => {
       matchInfo.value = {
          players: players,
-         targetWins: targetWins
+         targetWins: target_wins
       }
    });
 

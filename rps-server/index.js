@@ -212,14 +212,24 @@ const define_socket = () => {
 
         socket.on("start-game", async (lobby_name) => {
             let lobby = await firebase.get_doc("lobbies", lobby_name);
+            let player = await firebase.get_doc("players", socket.id);
 
             // only allow host to start game
             if (socket.id != lobby.host_player.id) {
                 return socket.emit("error", "Invalid user!");
             }
 
+            // make sure we are starting the proper lobby
+            if (player.lobby != lobby_name) {
+                return socket.emit("error", "Invalid lobby!");
+            }
+
             if (lobby.player_count < 2) {
                 return socket.emit("error", "At least 2 players required.");
+            }
+
+            if (lobby.game_state != "lobby") {
+                return socket.emit("error", "Lobby already started!");
             }
 
             lobby.game_state = "tournament"
@@ -259,10 +269,19 @@ const define_socket = () => {
                 }
 
                 io.to(p.id).emit("start-game", lobby);  // update lobby
+
+                let player_indexes = lobby.matches[lobby.current_match].players;
+                io.to(p.id).emit("match-start", {
+                    players: [
+                        lobby.players[player_indexes[0]],
+                        lobby.players[player_indexes[1]]
+                    ],
+                    target_wins: lobby.matches[lobby.current_match].target_wins
+                })
                 // start match
             }
 
-            firebase.set_doc("lobbies", lobby_name, lobby);
+            await firebase.set_doc("lobbies", lobby_name, lobby);
         })
     })
 }
