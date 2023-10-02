@@ -3,9 +3,9 @@
       <h1 class="lobby-title"><span>lobby:</span><br />{{lobby.name}}</h1>
       <div class="lobby-players">
          <div :class="selfID == player.id ? 'player highlight' : 'player'" v-for="player in lobby.players" :key="player.id">
-            <img :class="lobby.host_player.name == player.name ? 'host-icon' : 'host-icon hidden'" alt="Host" src="../assets/imgs/crown.png" />
-            <p class="name">{{ player.name }} {{selfID == player.id ? "(you)" : ""}}</p>
             <p class="sprite" @click="() => selfID == player.id ? emit('new-sprite') : ''">{{ player.sprite }}</p>
+            <p class="name">{{ player.name }} {{selfID == player.id ? "(you)" : ""}}</p>
+            <img :class="lobby.host_player.name == player.name ? 'host-icon' : 'host-icon hidden'" alt="Host" src="../assets/imgs/crown.png" />
          </div>
       </div>
       <div class="buttons">
@@ -90,6 +90,7 @@ button:disabled {
    width: 24px;
    height: 24px;
    image-rendering: pixelated;
+   margin-left: auto;
 }
 
 .player .host-icon.hidden {
@@ -99,7 +100,6 @@ button:disabled {
 .sprite {
    font-family: "Icons";
    font-size: 32px;
-   margin-left: auto;
    cursor: pointer;
    user-select: none;
 }
