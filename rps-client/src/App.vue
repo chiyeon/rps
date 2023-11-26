@@ -58,7 +58,7 @@ import Game from "./components/GameView.vue"
 const VERSION = ref("2.0");
 
 const DEBUG = ref(true);
-const ENDPOINT = DEBUG.value ? "http://localhost:3000/" : "https://rps-tourney.onrender.com"
+const ENDPOINT = DEBUG.value ? "http://localhost:3000/" : "https://glorious-halibut-5xvg957qx6734rpx-3000.app.github.dev/"
 
 const SPRITES = "EFLNQWYZaksuvwxy".split("")
 
@@ -174,7 +174,7 @@ function Select(_choice) {
 <style>
 @font-face {
    font-family: "Icons";
-   src: url(assets/fonts/Pixel\ Icons\ Compilation.ttf);
+   src: url(assets/fonts/pixel_icons.ttf);
 }
 
 @font-face {
